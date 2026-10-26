@@ -1,0 +1,7 @@
+{
+  "owner": "Test Owner",
+  "handle": "@testowner",
+  "palette": { "hero": "#0B7A75", "accent": "#9FE2DD" },
+  "fonts": { "masthead": "Bodoni Moda" },
+  "lines": { "todo": "TO DO: TEST LINE", "celebrate": "SHE PURRS FOR ME", "affirm": "TEST AFFIRMATION" }
+}

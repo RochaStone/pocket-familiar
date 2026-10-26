@@ -139,6 +139,13 @@ class Signals(unittest.TestCase):
         self.assertEqual(mood.failing_from_ledger('[{"id":"x","passed":false}]'), ["x"])
         self.assertEqual(mood.failing_from_ledger('{"all":"good"}'), [])
 
+    def test_goal_tests_ledger_exact_shape(self):
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+        with open(os.path.join(root, "goal-tests-ledger.json")) as fh:
+            self.assertEqual(mood.failing_from_ledger(fh.read()), ["newsletter-signup"])
+        fresh = '{"version": 1, "failing": [], "probes": {}, "runs": []}'
+        self.assertEqual(mood.failing_from_ledger(fresh), [])
+
     def test_ledger_log_latest_wins(self):
         log = "[t1] FAIL signup: broke\n[t1] FAIL booking rc=1\n[t2] PASS booking: ok\n"
         self.assertEqual(mood.failing_from_ledger(log), ["signup"])

@@ -87,12 +87,19 @@ familiar config --name Diamond          # rename her
 familiar config --watch invoiced        # the one number on her card
 familiar config --quiet 22:30-06:30     # her bedtime, or off
 familiar config --hunger-hours 36       # how long she can wait
-familiar config --ledger ~/probes/ledger.json      # she worries when a probe fails
+familiar config --ledger ~/.claude/goal-tests/ledger.json   # she worries when a probe fails
 familiar config --open-items ~/notes/OPEN_ITEMS.md # she gets restless when a default is due
 ```
 
-A ledger can be JSON (see `examples/ledger.example.json`) or a plain log with `PASS name` and `FAIL name` lines.
+The ledger is made for goal tests from Claude Code for Founders, which keeps it at `~/.claude/goal-tests/ledger.json`. She is worried for as long as its `failing` list has a name in it.
+Any other JSON with pass and fail statuses works too (see `examples/ledger.example.json`), and so does a plain log with `PASS name` and `FAIL name` lines.
 An open item is a markdown table row or a `- [ ]` line with a date in it. Struck-through or ticked rows are skipped. See `examples/open-items.example.md`.
+
+## Make it yours
+
+Her colours, fonts and lines come from one `style.json`, and the same file styles every Rocha Coded tool.
+Two come in the box: `examples/style.rocha-coded.json` (Rocha's look, the pink you see above) and `style.example.json` (blank, for yours). `STYLE.md` explains every key.
+Put yours in your working folder or in `~/.rocha-coded/style.json`, or ask Claude to make one with you from a few references.
 
 ## See her
 
@@ -109,9 +116,10 @@ An open item is a markdown table row or a `- [ ]` line with a date in it. Struck
 | `statusline.sh` | the Claude Code status line |
 | `hooks/` | session start greeting, session length tracking |
 | `templates/familiar.html` | the web card, one self-contained page |
+| `style.py`, `STYLE.md`, `style.example.json` | the shared style file: lookup, keys, a blank one to fill in |
 | `install.sh`, `uninstall.sh` | safe setup and a clean undo |
 | `SKILL.md` | tells Claude how to install, feed and read her |
-| `examples/` | the card above, a sample week, sample ledger and open items |
+| `examples/` | the card above, Rocha's style, a sample week, sample ledger and open items |
 | `tests/` | `python3 -m unittest discover -s tests` and `bash tests/test_statusline.sh` |
 
 Her memories live in `~/.familiar` on your computer. Nothing is sent anywhere.

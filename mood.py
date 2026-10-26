@@ -42,6 +42,7 @@ DEFAULT_CONFIG = {
     "ledger": None,
     "open_items": None,
     "watch": "shipped",
+    "style": None,
 }
 
 # Seven sprites, one per state. The ✧ in the mouth is her diamond grill. ∴ are her spots.
@@ -216,6 +217,11 @@ def failing_from_ledger(text: str) -> list:
                 latest[m.group(2)] = m.group(1)
         return sorted(name for name, s in latest.items() if s == "FAIL")
 
+    if isinstance(data, dict) and isinstance(data.get("failing"), list):
+        # goal-tests ledger (claude-code-for-founders): {"version", "failing": [names],
+        # "probes": {name: {"status": "pass"|"fail", ...}}, "runs", "last_run"}. "failing" is
+        # the runner's verdict for the latest sweep, so it is the one we trust.
+        return sorted(str(n) for n in data["failing"])
     if isinstance(data, dict):
         for key in ("probes", "goals", "results"):
             if key in data:

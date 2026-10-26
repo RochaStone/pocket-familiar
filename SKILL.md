@@ -26,6 +26,14 @@ export FAMILIAR_HOME="<the user's folder>/.familiar"
 ```
 If `familiar` is not on the PATH, run `python3 <this skill folder>/familiar` instead.
 
+## Make it hers (style.json)
+
+Her card and receipt take their colours, fonts and lines from one shared `style.json` (lookup order and keys in `STYLE.md`). With no file, Rocha's look in `examples/style.rocha-coded.json` is used as the example.
+
+If the user has no style.json, offer to make one: ask for 3 to 5 references (screenshots, links, a Pinterest board), a palette if she has one, and the words she says a lot. Write style.json. Show her one rendered sample. Never assume her taste is Rocha's.
+
+Write it to `style.json` in her working folder, or to `~/.rocha-coded/style.json` so every Rocha Coded tool finds it. Then render a sample with `familiar web` (add `--no-open` in a sandbox) and show it to her. Her familiar's name is not in style.json. Rename her with `familiar config --name`.
+
 ## Feed her on the user's behalf
 
 When the user tells you they did a business action, feed her once and say so in a short line, for example "I'll feed Lucky." Then run:
@@ -48,6 +56,6 @@ Rules:
 - `familiar status` gives her mood, the reason, the streak and the number the user watches.
 - `familiar card` prints this week as a guest check receipt.
 - `familiar web` writes `~/.familiar/familiar.html` and opens it. Use `--no-open` in a sandbox and give the user the file.
-- `familiar config` shows or sets optional signals: `--ledger` (a probe ledger, JSON or a PASS/FAIL log, makes her worried when a probe fails), `--open-items` (a markdown list, makes her restless when an item's default date has arrived), `--quiet 23:00-07:00`, `--hunger-hours 24`, `--watch invoiced`.
+- `familiar config` shows or sets optional signals: `--ledger` (the goal-tests `ledger.json`, usually `~/.claude/goal-tests/ledger.json`, or any JSON or PASS/FAIL log; she is worried while a probe fails), `--open-items` (a markdown list, makes her restless when an item's default date has arrived), `--quiet 23:00-07:00`, `--hunger-hours 24`, `--watch invoiced`, `--style path/to/style.json`.
 
 Her moods, first match wins: asleep, worried, celebrating, sleepy, restless, hungry, fed. The rules are documented at the top of `mood.py`.

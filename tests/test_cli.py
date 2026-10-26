@@ -79,5 +79,48 @@ class Cli(unittest.TestCase):
         self.assertEqual(self.run_cli("hook", "stop", stdin="not json").returncode, 0)
 
 
+    def test_second_style_changes_card(self):
+        self.run_cli("hatch", "--name", "Lucky")
+        self.run_cli("config", "--quiet", "off")
+        self.run_cli("feed", "shipped", "the newsletter")
+        house = os.path.join(self.tmp.name, "house.html")
+        self.run_cli("web", "--no-open", "--out", house)
+        second = os.path.join(ROOT, "tests", "fixtures", "style.second.json")
+        r = self.run_cli("config", "--style", second)
+        self.assertIn("style.second.json", r.stdout)
+        mine = os.path.join(self.tmp.name, "mine.html")
+        self.run_cli("web", "--no-open", "--out", mine)
+        with open(house) as fh:
+            a = fh.read()
+        with open(mine) as fh:
+            b = fh.read()
+        self.assertIn('"hero": "#FF2D8A"', a)
+        self.assertIn('"celebrate": "I AM SO LUCKY"', a)
+        self.assertIn('"hero": "#0B7A75"', b)
+        self.assertIn('"celebrate": "SHE PURRS FOR ME"', b)
+        self.assertIn('"plum": "#4A1033"', b)  # blank keys fall back key by key
+        card = self.run_cli("card").stdout
+        self.assertIn("SHE PURRS FOR ME", card)
+        self.assertIn("TO DO: TEST LINE", card)
+        self.assertNotIn("I AM SO LUCKY", card)
+        env = {**self.env, "FAMILIAR_COLOR": "1"}
+        env.pop("NO_COLOR")
+        coloured = subprocess.run([sys.executable, CLI, "status"], capture_output=True, text=True, env=env).stdout
+        self.assertIn("38;2;11;122;117", coloured)  # #0B7A75 in the terminal too
+
+    def test_bad_style_values_fall_back(self):
+        bad = os.path.join(self.tmp.name, "style.json")
+        with open(bad, "w") as fh:
+            json.dump({"palette": {"hero": "red;}</style><script>"}, "fonts": {"body": "x\"><script>"}}, fh)
+        self.run_cli("hatch", "--name", "Lucky")
+        self.run_cli("config", "--style", bad)
+        out = os.path.join(self.tmp.name, "c.html")
+        self.run_cli("web", "--no-open", "--out", out)
+        with open(out) as fh:
+            html = fh.read()
+        self.assertIn('"hero": "#FF2D8A"', html)
+        self.assertNotIn("<script>\"", html)
+
+
 if __name__ == "__main__":
     unittest.main()

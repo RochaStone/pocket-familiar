@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "failing": ["newsletter-signup"],
+  "probes": {
+    "booking-page-loads": {"goal": "the booking page answers", "build": "-", "rc": 0, "last_output": "200 OK", "last_run": "2026-10-26T07:50:01", "status": "pass", "last_pass": "2026-10-26T07:50:01", "fail_streak": 0},
+    "newsletter-signup": {"goal": "the signup form answers", "build": "-", "rc": 1, "last_output": "form returned 500", "last_run": "2026-10-26T07:50:01", "status": "fail", "last_fail": "2026-10-26T07:50:01", "fail_streak": 2, "last_pass": "2026-10-24T07:50:00"}
+  },
+  "runs": [{"at": "2026-10-25T07:50:00", "passed": 1, "failed": 1, "notified": true}, {"at": "2026-10-26T07:50:01", "passed": 1, "failed": 1, "notified": false}],
+  "last_run": "2026-10-26T07:50:01"
+}

@@ -23,11 +23,30 @@ sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, HERE)
 import mood  # noqa: E402
+import style as house  # noqa: E402
 
+# Terminal colours and words come from the shared style.json (see style.py). These are
+# Rocha's defaults until apply_style() runs.
 PINK = (255, 45, 138)
 CANDY = (255, 179, 209)
 INK = (17, 17, 17)
 GOLD = (212, 166, 74)
+STYLE = {}
+STYLE_PATH = ""
+
+
+def apply_style(config):
+    global PINK, CANDY, INK, GOLD, STYLE, STYLE_PATH
+    STYLE, STYLE_PATH = house.load(config.get("style"))
+    pal = STYLE.get("palette", {})
+    PINK = house.rgb(pal.get("hero", "#FF2D8A"))
+    CANDY = house.rgb(pal.get("accent", "#FFB3D1"))
+    INK = house.rgb(pal.get("ink", "#111111"))
+    GOLD = house.rgb(pal.get("gold", "#D4A64A"))
+
+
+def line_of(key, fallback=""):
+    return (STYLE.get("lines") or {}).get(key) or fallback
 
 
 def home():
@@ -220,7 +239,7 @@ def cmd_feed(args):
     m = current_mood(state, load_config(), t)
     print(paint(m.sprite, PINK, bold=True, on=on) + "  " + EATS[args.kind].format(name=state["name"]))
     if milestone:
-        print(paint(f"✧ {milestone} day streak. EVERYTHING WORKS OUT FOR ME.", GOLD, on=on))
+        print(paint(f"✧ {milestone} day streak. {line_of('affirm')}".rstrip(), GOLD, on=on))
     return 0
 
 
@@ -266,7 +285,7 @@ def cmd_card(args):
     table = f"TABLE {t.isocalendar()[1]:02d}"
     lines = [
         "GUEST CHECK".center(w),
-        "BUILD YOUR FOUNDER WORLD".center(w),
+        line_of("todo")[:w].center(w),
         row(f"SERVER {state['name'].upper()}", table),
         row(f"WEEK OF {week_start(t).strftime('%d %b %Y').upper()}", "GUESTS 1"),
         rule,
@@ -287,7 +306,7 @@ def cmd_card(args):
     lines.append(rule)
     lines.append(f"{m.sprite}  {m.state.upper()}".center(w))
     if m.state == "celebrating":
-        lines.append("I AM SO LUCKY".center(w))
+        lines.append(line_of("celebrate")[:w].center(w))
     lines.append("THANK YOU!".center(w))
     for line in lines:
         print(paint(line.ljust(w + 1), INK, CANDY, on=on))
@@ -310,6 +329,7 @@ def web_data(state, config, t):
         "watch": {"label": label, "value": value},
         "week": week_start(t).strftime("%d %b %Y"), "table": f"{t.isocalendar()[1]:02d}",
         "generated": t.strftime("%a %d %b, %H:%M"),
+        "style": {k: STYLE.get(k) for k in ("name", "owner", "handle", "palette", "fonts", "lines")},
     }
 
 
@@ -349,6 +369,9 @@ def cmd_config(args):
             print("Quiet hours look like 23:00-07:00 (or off).", file=sys.stderr)
             return 1
         config["quiet_hours"], changed = q, True
+    if args.style is not None:
+        config["style"] = None if args.style in ("", "none", "off") else os.path.abspath(os.path.expanduser(args.style))
+        changed = True
     if args.watch is not None:
         if args.watch not in WATCH_LABELS:
             print(f"Watch one of: {', '.join(WATCH_LABELS)}", file=sys.stderr)
@@ -363,6 +386,8 @@ def cmd_config(args):
         save_json(config_path(), config)
     for k, v in {**mood.DEFAULT_CONFIG, **config}.items():
         print(f"  {k:<13} {v if v is not None else 'off'}")
+    apply_style({**mood.DEFAULT_CONFIG, **config})
+    print(f"  style in use  {STYLE_PATH}")
     print(f"  (saved in {config_path()})")
     return 0
 
@@ -458,11 +483,13 @@ def main(argv=None):
     c.add_argument("--quiet", help="quiet hours like 23:00-07:00, or off")
     c.add_argument("--watch", help="shipped, sent, invoiced, rested, closed, streak or week")
     c.add_argument("--name", help="rename her")
+    c.add_argument("--style", help="a style.json to use everywhere (off to go back to the lookup order)")
     sub.add_parser("line", help=argparse.SUPPRESS)
     k = sub.add_parser("hook", help=argparse.SUPPRESS)
     k.add_argument("event", choices=("session-start", "stop"))
     k.add_argument("--end", action="store_true")
     args = p.parse_args(argv)
+    apply_style(load_config())
     handlers = {"hatch": cmd_hatch, "feed": cmd_feed, "status": cmd_status, "card": cmd_card,
                 "web": cmd_web, "config": cmd_config, "line": cmd_line, "hook": cmd_hook}
     return handlers[args.cmd](args)

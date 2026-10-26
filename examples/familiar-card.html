@@ -6,7 +6,6 @@
 <title>Pocket Familiar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Bodoni+Moda:ital,opsz,wght@1,6..96,700&family=Courier+Prime:wght@400;700&family=Newsreader:ital,wght@0,400;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
   :root {
     --hot: #FF2D8A; --candy: #FFB3D1; --paper: #FFE1EC; --cream: #F6EFE4; --ink: #111111;
@@ -135,7 +134,7 @@
 <body>
 <main class="check" aria-label="Your familiar">
   <div class="head"><span class="label title">Guest Check</span><span class="label" id="table"></span></div>
-  <div class="slogan">BUILD YOUR FOUNDER WORLD</div>
+  <div class="slogan" id="slogan"></div>
   <div class="sub"><span class="label" id="server"></span><span class="label" id="week"></span></div>
 
   <div class="stage">
@@ -144,7 +143,7 @@
       <div class="buttons" aria-hidden="true"><span></span><span></span><span></span></div>
     </div>
     <div class="stamp" id="stamp"></div>
-    <div class="sticker" id="sticker" hidden>I AM SO LUCKY</div>
+    <div class="sticker" id="sticker" hidden></div>
   </div>
 
   <h1 id="name"></h1>
@@ -172,11 +171,36 @@
 </main>
 
 <script>
-const DATA = {"name": "Lucky", "state": "celebrating", "reason": "7 day streak", "details": [], "sprite": "✧\\(=^✧^=)/✧", "line": "Lucky is celebrating. The diamonds are out.", "streak": 7, "hunger": 1, "feeds": [{"day": "MON", "time": "09:05", "kind": "shipped", "note": "the newsletter"}, {"day": "MON", "time": "15:30", "kind": "closed", "note": "website copy"}, {"day": "TUE", "time": "11:00", "kind": "sent", "note": "collab email"}, {"day": "WED", "time": "08:45", "kind": "rested", "note": "slow morning"}, {"day": "WED", "time": "17:20", "kind": "shipped", "note": "carousel on IG"}, {"day": "THU", "time": "13:10", "kind": "closed", "note": "booking page"}, {"day": "FRI", "time": "16:05", "kind": "invoiced", "note": "brand day, paid in full"}], "totals": {"shipped": 2, "sent": 1, "invoiced": 1, "rested": 1, "closed": 2}, "watch": {"label": "Invoiced this month", "value": 1}, "week": "19 Oct 2026", "table": "43", "generated": "Fri 23 Oct, 16:20"};
+const DATA = {"name": "Lucky", "state": "celebrating", "reason": "7 day streak", "details": [], "sprite": "✧\\(=^✧^=)/✧", "line": "Lucky is celebrating. The diamonds are out.", "streak": 7, "hunger": 1, "feeds": [{"day": "MON", "time": "09:05", "kind": "shipped", "note": "the newsletter"}, {"day": "MON", "time": "15:30", "kind": "closed", "note": "website copy"}, {"day": "TUE", "time": "11:00", "kind": "sent", "note": "collab email"}, {"day": "WED", "time": "08:45", "kind": "rested", "note": "slow morning"}, {"day": "WED", "time": "17:20", "kind": "shipped", "note": "carousel on IG"}, {"day": "THU", "time": "13:10", "kind": "closed", "note": "booking page"}, {"day": "FRI", "time": "16:05", "kind": "invoiced", "note": "brand day, paid in full"}], "totals": {"shipped": 2, "sent": 1, "invoiced": 1, "rested": 1, "closed": 2}, "watch": {"label": "Invoiced this month", "value": 1}, "week": "19 Oct 2026", "table": "43", "generated": "Fri 23 Oct, 16:20", "style": {"name": "Rocha Coded", "owner": "Rocha", "handle": "@rocheverse", "palette": {"hero": "#FF2D8A", "accent": "#FFB3D1", "paper": "#F6EFE4", "paper_pink": "#FFE1EC", "ink": "#111111", "marker": "#E0202E", "plum": "#4A1033", "gold": "#D4A64A", "cool": "#BFD4EA"}, "fonts": {"masthead": "Playfair Display", "label": "Archivo Narrow", "body": "Newsreader", "scrawl": "Permanent Marker", "mono": "Courier Prime"}, "lines": {"masthead": "THE ROCHEVERSE TIMES", "headline": "WHAT IF YOUR FOUNDER WORLD WORKS OUT?", "scrawl": "build your founder world", "todo": "TO DO: BUILD YOUR FOUNDER WORLD", "stamp": "LORE", "celebrate": "I AM SO LUCKY", "affirm": "EVERYTHING WORKS OUT FOR ME"}}};
 const SAMPLE = { name: "Lucky", state: "fed", reason: "just ate", details: [], line: "Lucky is fed and purring.",
   streak: 1, hunger: 0, feeds: [], totals: {}, watch: { label: "Shipped this month", value: 0 },
   week: "", table: "01", generated: "" };
 const d = DATA || SAMPLE;
+
+// ---- style.json: palette, fonts and lines. Values were checked in style.py (hex colours,
+// plain font names); lines only ever go in through textContent.
+const ST = d.style || {};
+const PAL = Object.assign({ hero: "#FF2D8A", accent: "#FFB3D1", paper: "#F6EFE4", paper_pink: "#FFE1EC",
+  ink: "#111111", marker: "#E0202E", plum: "#4A1033", gold: "#D4A64A", cool: "#BFD4EA" }, ST.palette || {});
+const FONTS = Object.assign({ masthead: "Playfair Display", label: "Archivo Narrow", body: "Newsreader",
+  scrawl: "Permanent Marker", mono: "Courier Prime" }, ST.fonts || {});
+const LINES = Object.assign({ todo: "", celebrate: "", affirm: "" }, ST.lines || {});
+(function applyStyle() {
+  const root = document.documentElement.style;
+  const map = { hot: "hero", candy: "accent", cream: "paper", paper: "paper_pink", ink: "ink",
+    red: "marker", plum: "plum", gold: "gold", blue: "cool" };
+  Object.entries(map).forEach(([v, k]) => root.setProperty("--" + v, PAL[k]));
+  const stacks = { serif: ["masthead", "Didot, Georgia, serif"], label: ["label", "'Arial Narrow', sans-serif"],
+    body: ["body", "Georgia, serif"], mono: ["mono", "'Courier New', monospace"], marker: ["scrawl", "'Marker Felt', cursive"] };
+  Object.entries(stacks).forEach(([v, [k, fb]]) => root.setProperty("--" + v, `"${FONTS[k]}", ${fb}`));
+  const axes = { masthead: ":ital,wght@0,700;1,700", label: ":wght@500;700", body: ":ital@0;1", mono: ":wght@400;700", scrawl: "" };
+  Object.entries(axes).forEach(([k, ax]) => {   // one link per font, so one unknown font cannot break the rest
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(FONTS[k]).replace(/%20/g, "+") + ax + "&display=swap";
+    document.head.appendChild(link);
+  });
+})();
 
 // ---- the leopard, drawn on a 20 x 20 grid. E = eyes (set per mood).
 const MAP = [
@@ -201,8 +225,8 @@ const MAP = [
   ".kphhpkppppppkphhpk.",
   ".kkkkkkkkkkkkkkkkkk."
 ].map(r => r.padEnd(20, "."));
-const COLORS = { k: "#111111", p: "#FFB3D1", h: "#FF2D8A", H: "#FFE1EC", s: "#4A1033",
-  d: "#BFD4EA", w: "#FFFFFF", g: "#D4A64A" };
+const COLORS = { k: PAL.ink, p: PAL.accent, h: PAL.hero, H: PAL.paper_pink, s: PAL.plum,
+  d: PAL.cool, w: "#FFFFFF", g: PAL.gold };
 const EYES = {   // [top row, bottom row] for each 2x2 eye
   fed: ["wk", "kk"], hungry: ["wk", "kw"], sleepy: ["pp", "kk"], celebrating: ["kk", "pp"],
   worried: ["kw", "kk"], restless: ["kw", "kw"], asleep: ["pp", "kk"]
@@ -220,14 +244,14 @@ function drawPet(state) {
     if (COLORS[c]) out += px(x, y, COLORS[c]);
   }));
   out += "</g>";
-  const star = (x, y, s, cls) => `<path class="glint ${cls}" fill="#FFFFFF" stroke="#D4A64A" stroke-width=".15" d="M${x} ${y - s}L${x + s * .3} ${y - s * .3}L${x + s} ${y}L${x + s * .3} ${y + s * .3}L${x} ${y + s}L${x - s * .3} ${y + s * .3}L${x - s} ${y}L${x - s * .3} ${y - s * .3}Z"/>`;
+  const star = (x, y, s, cls) => `<path class="glint ${cls}" fill="#FFFFFF" stroke="${PAL.gold}" stroke-width=".15" d="M${x} ${y - s}L${x + s * .3} ${y - s * .3}L${x + s} ${y}L${x + s * .3} ${y + s * .3}L${x} ${y + s}L${x - s * .3} ${y + s * .3}L${x - s} ${y}L${x - s * .3} ${y - s * .3}Z"/>`;
   out += star(8.5, 9.5, 1.1, "") + star(11.5, 9.4, .8, "two");
   const text = (x, y, t, size, color) => `<text x="${x}" y="${y}" font-family="Courier Prime, monospace" font-weight="700" font-size="${size}" fill="${color}">${t}</text>`;
-  if (state === "asleep") out += text(16, -0.5, "Zz", 3, "#4A1033");
-  if (state === "sleepy") out += text(17, 0, "z", 2.6, "#4A1033");
-  if (state === "worried") out += px(18, 3, "#BFD4EA") + px(18, 4, "#FFFFFF") + `<rect x="17.7" y="2.6" width="1.6" height="2.6" fill="none" stroke="#4A1033" stroke-width=".2"/>`;
-  if (state === "restless") out += text(-2, 9, "≋", 3, "#FF2D8A") + text(19.5, 9, "≋", 3, "#FF2D8A");
-  if (state === "hungry") out += text(-1.5, 18, "?", 3.2, "#E0202E");
+  if (state === "asleep") out += text(16, -0.5, "Zz", 3, PAL.plum);
+  if (state === "sleepy") out += text(17, 0, "z", 2.6, PAL.plum);
+  if (state === "worried") out += px(18, 3, PAL.cool) + px(18, 4, "#FFFFFF") + `<rect x="17.7" y="2.6" width="1.6" height="2.6" fill="none" stroke="${PAL.plum}" stroke-width=".2"/>`;
+  if (state === "restless") out += text(-2, 9, "≋", 3, PAL.hero) + text(19.5, 9, "≋", 3, PAL.hero);
+  if (state === "hungry") out += text(-1.5, 18, "?", 3.2, PAL.marker);
   if (state === "celebrating") out += star(-0.5, 1, 1.2, "") + star(20.5, 2, 1.4, "two") + star(19.5, 15, 1, "") + star(0, 14, .9, "two");
   document.getElementById("pet").innerHTML = out;
 }
@@ -240,7 +264,10 @@ $("table").textContent = "Table " + d.table;
 $("server").textContent = "Server " + d.name;
 $("week").textContent = d.week ? "Week of " + d.week : "";
 $("stamp").textContent = d.state;
-$("sticker").hidden = d.state !== "celebrating";
+$("slogan").textContent = LINES.todo;
+$("slogan").hidden = !LINES.todo;
+$("sticker").textContent = LINES.celebrate;
+$("sticker").hidden = d.state !== "celebrating" || !LINES.celebrate;
 $("name").textContent = d.name;
 $("line").textContent = d.line;
 $("why").textContent = d.reason;
@@ -294,7 +321,7 @@ KINDS.forEach(k => {
   });
   $("feedrow").appendChild(b);
 });
-$("foot").textContent = "pocket-familiar · Rocha Coded" + (d.generated ? " · printed " + d.generated : "");
+$("foot").textContent = ["pocket-familiar", [ST.owner, ST.handle].filter(Boolean).join(" "), d.generated ? "printed " + d.generated : ""].filter(Boolean).join(" · ");
 </script>
 </body>
 </html>
