@@ -39,7 +39,7 @@ DEFAULT_CONFIG = {
     "hunger_hours": 24,
     "sleepy_hours": 3,
     "quiet_hours": "23:00-07:00",
-    "ledger": None,
+    "ledger": None,  # None = find goal tests on its own, False = off, or a path
     "open_items": None,
     "watch": "shipped",
     "style": None,
@@ -185,6 +185,48 @@ def decide(state: dict, config: dict, now: datetime,
     return Mood("fed", f"last meal {h:.1f}h ago" if h >= 1 else "just ate")
 
 
+# ---------------------------------------------------------------- the week, for cards
+
+WATCH_LABELS = {k: f"{k.capitalize()} this month" for k in KINDS}
+WATCH_LABELS.update({"streak": "Day streak", "week": "Feeds this week"})
+
+
+def week_start(t):
+    return (t - timedelta(days=t.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def week_feeds(state, t):
+    start = week_start(t)
+    return [f for f in state.get("feeds", []) if parse_time(f["at"]) >= start]
+
+
+def totals(feeds):
+    return {k: sum(1 for f in feeds if f["kind"] == k) for k in KINDS}
+
+
+def watch_value(state, config, t):
+    key = config.get("watch") or "shipped"
+    if key == "streak":
+        value = streak(state, t)
+    elif key == "week":
+        value = len(week_feeds(state, t))
+    elif key in KINDS:
+        value = sum(1 for f in state.get("feeds", [])
+                    if f["kind"] == key and parse_time(f["at"]).astimezone(t.tzinfo).strftime("%Y-%m") == t.strftime("%Y-%m"))
+    else:
+        key, value = "shipped", 0
+    return WATCH_LABELS[key], value
+
+
+def ago(t, then):
+    mins = int((t - then).total_seconds() // 60)
+    if mins < 60:
+        return f"{mins}m ago"
+    if mins < 60 * 48:
+        return f"{mins // 60}h ago"
+    return f"{mins // 1440}d ago"
+
+
 # ---------------------------------------------------------------- outside signals
 
 FAIL_WORDS = {"fail", "failed", "failing", "red", "broken", "error"}
@@ -204,9 +246,14 @@ def _entry_fails(value) -> bool:
     return False
 
 
-def failing_from_ledger(text: str) -> list:
+STALE_AFTER = timedelta(hours=26)
+
+
+def failing_from_ledger(text: str, now: datetime | None = None) -> list:
     """Names of failing probes. Accepts JSON (list, {"probes": [...]}, or {name: status})
-    or a plain log where lines read like "[time] FAIL name: ..." (the latest line per name wins)."""
+    or a plain log where lines read like "[time] FAIL name: ..." (the latest line per name wins).
+    A goal-tests ledger whose last_run is over 26 hours old means the sweep has not run:
+    that is unknown, not failing, so it returns no names."""
     try:
         data = json.loads(text)
     except ValueError:
@@ -221,6 +268,16 @@ def failing_from_ledger(text: str) -> list:
         # goal-tests ledger (claude-code-for-founders): {"version", "failing": [names],
         # "probes": {name: {"status": "pass"|"fail", ...}}, "runs", "last_run"}. "failing" is
         # the runner's verdict for the latest sweep, so it is the one we trust.
+        last = data.get("last_run")
+        if now is not None and isinstance(last, str):
+            try:
+                ran = datetime.fromisoformat(last)
+            except ValueError:
+                ran = None
+            if ran is not None:
+                ran = ran.replace(tzinfo=now.tzinfo) if ran.tzinfo is None else ran  # runner writes local time
+                if now - ran > STALE_AFTER:
+                    return []
         return sorted(str(n) for n in data["failing"])
     if isinstance(data, dict):
         for key in ("probes", "goals", "results"):

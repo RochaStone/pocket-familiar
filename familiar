@@ -106,10 +106,23 @@ def read_text(path):
         return None
 
 
+def goal_tests_ledger():
+    """Where goal tests keeps its ledger: $GOAL_TESTS_HOME/ledger.json, then
+    ~/.claude/goal-tests/ledger.json. Missing means goal tests is not installed: no worry."""
+    paths = []
+    if os.environ.get("GOAL_TESTS_HOME"):
+        paths.append(os.path.join(os.path.expanduser(os.environ["GOAL_TESTS_HOME"]), "ledger.json"))
+    paths.append(os.path.expanduser("~/.claude/goal-tests/ledger.json"))
+    return next((p for p in paths if os.path.isfile(p)), None)
+
+
 def current_mood(state, config, t):
-    ledger = read_text(config.get("ledger"))
+    path = config.get("ledger")
+    if path is None:
+        path = goal_tests_ledger()
+    ledger = read_text(path) if path else None
     items = read_text(config.get("open_items"))
-    failing = mood.failing_from_ledger(ledger) if ledger else []
+    failing = mood.failing_from_ledger(ledger, t) if ledger else []
     due = mood.due_open_items(items, t.date()) if items else []
     return mood.decide(state, config, t, failing, due)
 
@@ -153,44 +166,9 @@ EATS = {
     "rested": "Rested. {name} curls up next to you.",
     "closed": "Closed. {name} batted it off the table.",
 }
-WATCH_LABELS = {k: f"{k.capitalize()} this month" for k in mood.KINDS}
-WATCH_LABELS.update({"streak": "Day streak", "week": "Feeds this week"})
-
-
-def week_start(t):
-    return (t - timedelta(days=t.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
-
-
-def week_feeds(state, t):
-    start = week_start(t)
-    return [f for f in state.get("feeds", []) if mood.parse_time(f["at"]) >= start]
-
-
-def totals(feeds):
-    return {k: sum(1 for f in feeds if f["kind"] == k) for k in mood.KINDS}
-
-
-def watch_value(state, config, t):
-    key = config.get("watch") or "shipped"
-    if key == "streak":
-        value = mood.streak(state, t)
-    elif key == "week":
-        value = len(week_feeds(state, t))
-    elif key in mood.KINDS:
-        value = sum(1 for f in state.get("feeds", [])
-                    if f["kind"] == key and mood.parse_time(f["at"]).astimezone(t.tzinfo).strftime("%Y-%m") == t.strftime("%Y-%m"))
-    else:
-        key, value = "shipped", 0
-    return WATCH_LABELS[key], value
-
-
-def ago(t, then):
-    mins = int((t - then).total_seconds() // 60)
-    if mins < 60:
-        return f"{mins}m ago"
-    if mins < 60 * 48:
-        return f"{mins // 60}h ago"
-    return f"{mins // 1440}d ago"
+WATCH_LABELS = mood.WATCH_LABELS
+week_start, week_feeds, totals, watch_value, ago = (
+    mood.week_start, mood.week_feeds, mood.totals, mood.watch_value, mood.ago)
 
 
 def need_state():
@@ -357,7 +335,12 @@ def cmd_config(args):
     for key in ("ledger", "open_items"):
         value = getattr(args, key)
         if value is not None:
-            config[key] = None if value in ("", "none", "off") else os.path.abspath(os.path.expanduser(value))
+            if value in ("", "none", "off"):
+                config[key] = False if key == "ledger" else None
+            elif key == "ledger" and value == "auto":
+                config[key] = None
+            else:
+                config[key] = os.path.abspath(os.path.expanduser(value))
             changed = True
     if args.hunger_hours is not None:
         config["hunger_hours"], changed = args.hunger_hours, True
@@ -385,7 +368,8 @@ def cmd_config(args):
     if changed:
         save_json(config_path(), config)
     for k, v in {**mood.DEFAULT_CONFIG, **config}.items():
-        print(f"  {k:<13} {v if v is not None else 'off'}")
+        shown = ("auto" if v is None else "off") if k == "ledger" and not v else (v if v is not None else "off")
+        print(f"  {k:<13} {shown}")
     apply_style({**mood.DEFAULT_CONFIG, **config})
     print(f"  style in use  {STYLE_PATH}")
     print(f"  (saved in {config_path()})")
@@ -476,7 +460,7 @@ def main(argv=None):
     w.add_argument("--out")
     w.add_argument("--no-open", action="store_true")
     c = sub.add_parser("config", help="optional settings")
-    c.add_argument("--ledger", help="probe ledger (JSON or PASS/FAIL log); off to clear")
+    c.add_argument("--ledger", help="probe ledger path; auto finds goal tests (default); off ignores it")
     c.add_argument("--open-items", dest="open_items", help="open items markdown; off to clear")
     c.add_argument("--hunger-hours", type=float)
     c.add_argument("--sleepy-hours", type=float)

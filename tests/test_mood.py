@@ -146,6 +146,17 @@ class Signals(unittest.TestCase):
         fresh = '{"version": 1, "failing": [], "probes": {}, "runs": []}'
         self.assertEqual(mood.failing_from_ledger(fresh), [])
 
+    def test_goal_tests_real_sample_and_staleness(self):
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+        with open(os.path.join(root, "goal-tests-ledger.real.json")) as fh:
+            text = fh.read()
+        fresh = datetime(2026, 10, 26, 16, 0, tzinfo=TZ)
+        self.assertEqual(mood.failing_from_ledger(text, fresh), ["offer-page"])
+        self.assertEqual(mood.failing_from_ledger(text, fresh + timedelta(hours=27)), [])  # sweep stopped: unknown
+        self.assertEqual(mood.failing_from_ledger(text), ["offer-page"])  # no clock given: trust the list
+        skipped = text.replace('"version": 1,', '"version": 1, "last_skipped": {"at": "2026-10-26T15:40:00", "reason": "offline"},')
+        self.assertEqual(mood.failing_from_ledger(skipped, fresh), ["offer-page"])
+
     def test_ledger_log_latest_wins(self):
         log = "[t1] FAIL signup: broke\n[t1] FAIL booking rc=1\n[t2] PASS booking: ok\n"
         self.assertEqual(mood.failing_from_ledger(log), ["signup"])

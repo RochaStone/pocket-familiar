@@ -87,11 +87,12 @@ familiar config --name Diamond          # rename her
 familiar config --watch invoiced        # the one number on her card
 familiar config --quiet 22:30-06:30     # her bedtime, or off
 familiar config --hunger-hours 36       # how long she can wait
-familiar config --ledger ~/.claude/goal-tests/ledger.json   # she worries when a probe fails
+familiar config --ledger ~/probes/ledger.json   # a ledger somewhere else (goal tests is found on its own)
 familiar config --open-items ~/notes/OPEN_ITEMS.md # she gets restless when a default is due
 ```
 
-The ledger is made for goal tests from Claude Code for Founders, which keeps it at `~/.claude/goal-tests/ledger.json`. She is worried for as long as its `failing` list has a name in it.
+If you use goal tests from Claude Code for Founders, she finds its ledger on her own (`$GOAL_TESTS_HOME/ledger.json`, then `~/.claude/goal-tests/ledger.json`). She is worried for as long as its `failing` list has a name in it.
+No ledger means no worry. A ledger older than 26 hours means the daily sweep has not run, so she does not worry about it either. `familiar config --ledger off` turns this off.
 Any other JSON with pass and fail statuses works too (see `examples/ledger.example.json`), and so does a plain log with `PASS name` and `FAIL name` lines.
 An open item is a markdown table row or a `- [ ]` line with a date in it. Struck-through or ticked rows are skipped. See `examples/open-items.example.md`.
 

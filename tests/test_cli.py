@@ -14,7 +14,9 @@ class Cli(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.env = {**os.environ, "FAMILIAR_HOME": self.tmp.name,
-                    "FAMILIAR_NOW": "2026-10-26T14:00:00+08:00", "NO_COLOR": "1"}
+                    "FAMILIAR_NOW": "2026-10-26T14:00:00+08:00", "NO_COLOR": "1",
+                    "HOME": self.tmp.name}  # never sees a real goal-tests install or style
+        self.env.pop("GOAL_TESTS_HOME", None)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -69,6 +71,26 @@ class Cli(unittest.TestCase):
         self.assertIn("restless", self.run_cli("status").stdout)
         self.assertEqual(self.run_cli("config", "--watch", "nonsense").returncode, 1)
         self.assertEqual(self.run_cli("config", "--quiet", "late").returncode, 1)
+
+    def test_goal_tests_found_on_its_own(self):
+        gt = os.path.join(self.tmp.name, "gt")
+        os.makedirs(gt)
+        with open(os.path.join(ROOT, "tests", "fixtures", "goal-tests-ledger.real.json")) as src, \
+                open(os.path.join(gt, "ledger.json"), "w") as dst:
+            dst.write(src.read())
+        self.env["GOAL_TESTS_HOME"] = gt
+        self.env["FAMILIAR_NOW"] = "2026-10-26T16:00:00+08:00"
+        self.run_cli("hatch", "--name", "Lucky")
+        self.run_cli("config", "--quiet", "off")
+        self.run_cli("feed", "sent")
+        status = self.run_cli("status").stdout
+        self.assertIn("worried", status)
+        self.assertIn("offer-page", status)
+        self.run_cli("config", "--ledger", "off")
+        self.assertNotIn("worried", self.run_cli("status").stdout)
+        self.assertIn("ledger        auto", self.run_cli("config", "--ledger", "auto").stdout)
+        os.remove(os.path.join(gt, "ledger.json"))  # not installed: no worry
+        self.assertNotIn("worried", self.run_cli("status").stdout)
 
     def test_hooks_track_sessions(self):
         self.run_cli("hatch", "--name", "Lucky")

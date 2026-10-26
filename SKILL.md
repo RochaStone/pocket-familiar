@@ -56,6 +56,6 @@ Rules:
 - `familiar status` gives her mood, the reason, the streak and the number the user watches.
 - `familiar card` prints this week as a guest check receipt.
 - `familiar web` writes `~/.familiar/familiar.html` and opens it. Use `--no-open` in a sandbox and give the user the file.
-- `familiar config` shows or sets optional signals: `--ledger` (the goal-tests `ledger.json`, usually `~/.claude/goal-tests/ledger.json`, or any JSON or PASS/FAIL log; she is worried while a probe fails), `--open-items` (a markdown list, makes her restless when an item's default date has arrived), `--quiet 23:00-07:00`, `--hunger-hours 24`, `--watch invoiced`, `--style path/to/style.json`.
+- `familiar config` shows or sets optional signals: `--ledger` (goal tests is found on its own at `$GOAL_TESTS_HOME/ledger.json` or `~/.claude/goal-tests/ledger.json`; she is worried while its `failing` list is not empty, and a ledger older than 26 hours counts as unknown, not failing; pass a path for another ledger or `off`), `--open-items` (a markdown list, makes her restless when an item's default date has arrived), `--quiet 23:00-07:00`, `--hunger-hours 24`, `--watch invoiced`, `--style path/to/style.json`.
 
 Her moods, first match wins: asleep, worried, celebrating, sleepy, restless, hungry, fed. The rules are documented at the top of `mood.py`.
