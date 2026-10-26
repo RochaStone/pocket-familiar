@@ -10,7 +10,9 @@ Every Rocha Coded tool reads the same file, so you make it once.
 3. `~/.rocha-coded/style.json`
 4. `examples/style.rocha-coded.json` in this tool
 
-Leave any key blank and that one key falls back to the bundled example.
+Leave a colour or a font blank and that one key falls back to the bundled example.
+Your words never fall back to Rocha's. A blank line, owner or handle stays blank, and the card leaves it out.
+Her lines only show when you have no style.json at all and her example is the style in use.
 
 ## The keys
 | Key | What to put | Used by the familiar |

@@ -5,7 +5,10 @@ Lookup order, first file found wins:
   2. ./style.json (the folder you are working in)
   3. ~/.rocha-coded/style.json
   4. examples/style.rocha-coded.json bundled here (Rocha's look, the house example)
-Blank or missing keys fall back to the bundled example, key by key. Colours must be hex
+Inheritance: when a user style.json is found, only blank or missing palette and fonts keys
+fall back to the bundled example. Lines, owner, handle, name, references and notes never
+borrow Rocha's words: a missing line stays blank and the card simply leaves it out. Her lines
+appear only when the bundled example itself is the style in use. Colours must be hex
 (#RGB or #RRGGBB) and font names plain letters, digits and spaces, or they fall back too.
 The familiar's own name lives in her state, never in style.json.
 """
@@ -44,7 +47,11 @@ def _read(path: str):
 
 
 def merge(base: dict, user: dict) -> dict:
-    out = json.loads(json.dumps(base))
+    out = {"palette": dict(base.get("palette", {})), "fonts": dict(base.get("fonts", {})),
+           "lines": {}, "references": []}
+    for key in TEXT_KEYS:
+        out[key] = ""
+    out["motif"] = base.get("motif", "neutral")
     for key in TEXT_KEYS:
         v = user.get(key)
         if isinstance(v, str) and v.strip():
@@ -70,6 +77,8 @@ def load(override: str | None = None, cwd: str | None = None) -> tuple:
     for path in candidates(override, cwd):
         data = _read(path)
         if data is not None:
+            if os.path.realpath(path) == os.path.realpath(BUNDLED):
+                return base, path
             return merge(base, data), path
     return base, BUNDLED
 

@@ -130,6 +130,27 @@ class Cli(unittest.TestCase):
         coloured = subprocess.run([sys.executable, CLI, "status"], capture_output=True, text=True, env=env).stdout
         self.assertIn("38;2;11;122;117", coloured)  # #0B7A75 in the terminal too
 
+    def test_user_style_never_borrows_her_words(self):
+        mine = os.path.join(self.tmp.name, "style.json")
+        with open(mine, "w") as fh:
+            json.dump({"palette": {"hero": "#0B7A75"}}, fh)  # colours only, no lines, no owner
+        self.run_cli("hatch", "--name", "Lucky")
+        self.run_cli("config", "--quiet", "off", "--style", mine)
+        self.run_cli("feed", "shipped", "the newsletter")
+        out = os.path.join(self.tmp.name, "c.html")
+        self.run_cli("web", "--no-open", "--out", out)
+        with open(out) as fh:
+            html = fh.read()
+        self.assertIn('"hero": "#0B7A75"', html)
+        self.assertIn('"plum": "#4A1033"', html)              # palette may fall back
+        self.assertIn('"masthead": "Playfair Display"', html)  # fonts may fall back
+        for hers in ("I AM SO LUCKY", "EVERYTHING WORKS OUT", "BUILD YOUR FOUNDER WORLD", "Rocha", "@rocheverse"):
+            self.assertNotIn(hers, html.split("const DATA")[1].split("const SAMPLE")[0])
+        card = self.run_cli("card").stdout
+        for hers in ("I AM SO LUCKY", "BUILD YOUR FOUNDER WORLD"):
+            self.assertNotIn(hers, card)
+        self.assertIn("GUEST CHECK", card)
+
     def test_bad_style_values_fall_back(self):
         bad = os.path.join(self.tmp.name, "style.json")
         with open(bad, "w") as fh:

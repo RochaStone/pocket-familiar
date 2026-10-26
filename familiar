@@ -263,7 +263,7 @@ def cmd_card(args):
     table = f"TABLE {t.isocalendar()[1]:02d}"
     lines = [
         "GUEST CHECK".center(w),
-        line_of("todo")[:w].center(w),
+        *([line_of("todo")[:w].center(w)] if line_of("todo") else []),
         row(f"SERVER {state['name'].upper()}", table),
         row(f"WEEK OF {week_start(t).strftime('%d %b %Y').upper()}", "GUESTS 1"),
         rule,
@@ -283,7 +283,7 @@ def cmd_card(args):
     lines.append(row("TOTAL", f"{len(feeds)} FEEDS"))
     lines.append(rule)
     lines.append(f"{m.sprite}  {m.state.upper()}".center(w))
-    if m.state == "celebrating":
+    if m.state == "celebrating" and line_of("celebrate"):
         lines.append(line_of("celebrate")[:w].center(w))
     lines.append("THANK YOU!".center(w))
     for line in lines:
