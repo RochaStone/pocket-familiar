@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Familiar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Bodoni+Moda:ital,opsz,wght@1,6..96,700&family=Courier+Prime:wght@400;700&family=Newsreader:ital,wght@0,400;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hot: #FF2D8A; --candy: #FFB3D1; --paper: #FFE1EC; --cream: #F6EFE4; --ink: #111111;
+    --red: #E0202E; --plum: #4A1033; --gold: #D4A64A; --blue: #BFD4EA; --white: #FFFFFF;
+    --serif: "Bodoni Moda", "Playfair Display", Didot, Georgia, serif;
+    --label: "Archivo Narrow", "Arial Narrow", sans-serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "Courier Prime", "Courier New", monospace;
+    --marker: "Permanent Marker", "Marker Felt", cursive;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--cream);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .29 0 0 0 0 .06 0 0 0 0 .2 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    color: var(--ink); font-family: var(--body);
+    min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
+    padding: 40px 16px 56px;
+  }
+  .check {
+    width: 100%; max-width: 420px; position: relative; transform: rotate(-0.8deg);
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(255,45,138,.22) 27px 28px);
+    box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 18px 34px -12px rgba(74,16,51,.38), 0 3px 8px rgba(74,16,51,.12);
+    padding: 22px 24px 40px;
+    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+            mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  }
+  .check::before { /* red margin rule like a real pad */
+    content: ""; position: absolute; top: 0; bottom: 0; left: 16px; width: 1px; background: rgba(224,32,46,.35);
+  }
+  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--hot); padding-bottom: 6px; }
+  .label { font-family: var(--label); text-transform: uppercase; letter-spacing: .16em; font-weight: 700; font-size: 12px; }
+  .head .title { color: var(--hot); font-size: 15px; letter-spacing: .28em; }
+  .sub { display: flex; justify-content: space-between; margin-top: 6px; color: var(--plum); font-size: 11px; }
+
+  .stage { display: grid; grid-template-columns: 1fr; justify-items: center; margin: 22px 0 6px; position: relative; }
+  .egg {
+    width: 236px; height: 270px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+    background-color: var(--hot);
+    background-image:
+      radial-gradient(circle at 18% 22%, var(--plum) 0 5px, transparent 6px),
+      radial-gradient(circle at 80% 18%, var(--plum) 0 4px, transparent 5px),
+      radial-gradient(circle at 12% 62%, var(--plum) 0 4px, transparent 5px),
+      radial-gradient(circle at 88% 58%, var(--plum) 0 6px, transparent 7px),
+      radial-gradient(circle at 30% 90%, var(--plum) 0 4px, transparent 5px),
+      radial-gradient(circle at 72% 88%, var(--plum) 0 5px, transparent 6px),
+      radial-gradient(circle at 50% 8%, var(--plum) 0 3px, transparent 4px),
+      radial-gradient(ellipse at 32% 24%, rgba(255,255,255,.45), transparent 40%);
+    box-shadow: inset -10px -14px 0 rgba(74,16,51,.18), inset 8px 10px 0 rgba(255,255,255,.18), 0 10px 18px -8px rgba(74,16,51,.5);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  }
+  .screen {
+    width: 150px; height: 140px; border-radius: 14px; background: var(--blue);
+    border: 5px solid var(--plum); box-shadow: inset 0 0 0 3px rgba(255,255,255,.5);
+    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+  }
+  .screen::after { /* LCD scanlines */
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(17,17,17,.05) 0 1px, transparent 1px 3px);
+  }
+  .screen svg { width: 116px; height: 116px; image-rendering: pixelated; }
+  .buttons { display: flex; gap: 14px; }
+  .buttons span { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); box-shadow: inset -2px -3px 0 rgba(74,16,51,.35); }
+  .glint { animation: glint 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  .glint.two { animation-delay: 1.2s; }
+  @keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(.4); } 80% { opacity: 1; transform: scale(1.15); } 90% { opacity: .8; transform: scale(.9); } }
+  .float { animation: float 2.6s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
+  @media (prefers-reduced-motion: reduce) { .glint, .float { animation: none; } .glint { opacity: 1; } }
+
+  .stamp {
+    position: absolute; right: -4px; top: 6px; transform: rotate(9deg);
+    font-family: var(--marker); color: var(--red); font-size: 24px; line-height: 1;
+    border: 3px solid var(--red); border-radius: 6px; padding: 6px 8px 4px; background: rgba(255,225,236,.6);
+    text-transform: uppercase; letter-spacing: .02em;
+  }
+  h1 { font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 58px; line-height: 1; margin: 12px 0 2px; color: var(--ink); text-align: center; letter-spacing: -.01em; }
+  .line { text-align: center; font-size: 18px; margin: 4px 0 2px; }
+  .why { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--plum); margin: 0 0 16px; }
+  .why ul { list-style: none; padding: 0; margin: 4px 0 0; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px dashed var(--plum); border-bottom: 1px dashed var(--plum); }
+  .stat { padding: 10px 6px; text-align: center; }
+  .stat + .stat { border-left: 1px dashed var(--plum); }
+  .stat .n { font-family: var(--serif); font-style: italic; font-size: 34px; line-height: 1.05; color: var(--hot); }
+  .stat .label { font-size: 10px; color: var(--plum); display: block; margin-top: 2px; }
+  .meter { height: 10px; margin: 12px 6px 6px; border: 2px solid var(--ink); background: var(--white); position: relative; }
+  .meter i { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(90deg, var(--hot) 0 6px, var(--candy) 6px 8px); }
+
+  .receipt { font-family: var(--mono); font-size: 14px; margin: 16px 0 8px; }
+  .receipt .r { display: flex; gap: 8px; line-height: 28px; }
+  .receipt .r .d { width: 34px; color: var(--plum); }
+  .receipt .r .k { width: 76px; text-transform: uppercase; font-weight: 700; }
+  .receipt .r .note { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .receipt .r .t { color: var(--plum); }
+  .receipt .empty { line-height: 28px; color: var(--plum); font-style: italic; }
+  .totals { font-family: var(--mono); font-size: 14px; border-top: 2px solid var(--ink); padding-top: 4px; }
+  .totals .r { display: flex; justify-content: space-between; line-height: 28px; text-transform: uppercase; }
+  .totals .grand { font-weight: 700; border-top: 1px solid var(--ink); }
+
+  .feed { margin-top: 20px; }
+  .feed h2 { font-family: var(--label); text-transform: uppercase; letter-spacing: .2em; font-size: 13px; margin: 0 0 8px; color: var(--hot); }
+  .feed .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .feed button {
+    font-family: var(--label); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: 12px;
+    color: var(--ink); background: var(--white); border: 2px solid var(--ink); border-radius: 999px;
+    padding: 8px 12px; cursor: pointer; box-shadow: 2px 2px 0 var(--hot);
+  }
+  .feed button:hover, .feed button:focus-visible { background: var(--candy); outline: none; }
+  .feed button:active { transform: translate(2px, 2px); box-shadow: none; }
+  .feed p { font-size: 14px; margin: 10px 0 0; color: var(--plum); }
+  .toast { font-family: var(--mono); font-size: 12px; min-height: 18px; margin-top: 6px; color: var(--red); }
+  .thanks { font-family: var(--marker); color: var(--red); font-size: 30px; text-align: center; margin: 22px 0 0; transform: rotate(-3deg); }
+  .foot { text-align: center; margin-top: 8px; color: var(--plum); font-size: 10px; }
+  @media (max-width: 380px) { h1 { font-size: 46px; } .egg { width: 210px; height: 244px; } .stamp { font-size: 19px; } }
+</style>
+</head>
+<body>
+<main class="check" aria-label="Your familiar">
+  <div class="head"><span class="label title">Guest Check</span><span class="label" id="table"></span></div>
+  <div class="sub"><span class="label" id="server"></span><span class="label" id="week"></span></div>
+
+  <div class="stage">
+    <div class="egg">
+      <div class="screen"><svg id="pet" viewBox="-2 -3 24 24" role="img" aria-label="Pixel leopard"></svg></div>
+      <div class="buttons" aria-hidden="true"><span></span><span></span><span></span></div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+
+  <h1 id="name"></h1>
+  <p class="line" id="line"></p>
+  <div class="why" id="why"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="streak"></div><span class="label">Day streak</span></div>
+    <div class="stat"><div class="meter" aria-hidden="true"><i id="hungerbar"></i></div><span class="label" id="hunger"></span></div>
+    <div class="stat"><div class="n" id="watchn"></div><span class="label" id="watchl"></span></div>
+  </div>
+
+  <div class="receipt" id="receipt"></div>
+  <div class="totals" id="totals"></div>
+
+  <section class="feed">
+    <h2>Feed her</h2>
+    <div class="row" id="feedrow"></div>
+    <p>Feeding happens in your terminal. Tap a dish to copy the command, then paste it there and add a note.</p>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </section>
+
+  <div class="thanks">THANK YOU!</div>
+  <div class="foot label" id="foot"></div>
+</main>
+
+<script>
+const DATA = /*__FAMILIAR_DATA__*/null;
+const SAMPLE = { name: "Lucky", state: "fed", reason: "just ate", details: [], line: "Lucky is fed and purring.",
+  streak: 1, hunger: 0, feeds: [], totals: {}, watch: { label: "Shipped this month", value: 0 },
+  week: "", table: "01", generated: "" };
+const d = DATA || SAMPLE;
+
+// ---- the leopard, drawn on a 20 x 20 grid. E = eyes (set per mood).
+const MAP = [
+  "..kk............kk..",
+  ".khpk..........kphk.",
+  ".khhpk........kphhk.",
+  ".kppppkkkkkkkkppppk.",
+  "kppspppppsspppppsppk",
+  "kpsppppppppppppppspk",
+  "kpppEEpppsspppEEpppk",
+  "kpppEEppppppppEEpppk",
+  "kphhpppppkkppppphhpk",
+  "kpppppkdwddwdkpppppk",
+  "kppppppkgddgkppppppk",
+  "kpppppppkkkkpppppppk",
+  ".kpsppppppppppppspk.",
+  "..kkppppppppppppkk..",
+  "...kppsppppppsppk...",
+  "..kpspppHHHHpppspk..",
+  ".kppspppHHHHpppsppk.",
+  ".kppsppppppppppsppk.",
+  ".kphhpkppppppkphhpk.",
+  ".kkkkkkkkkkkkkkkkkk."
+].map(r => r.padEnd(20, "."));
+const COLORS = { k: "#111111", p: "#FFB3D1", h: "#FF2D8A", H: "#FFE1EC", s: "#4A1033",
+  d: "#BFD4EA", w: "#FFFFFF", g: "#D4A64A" };
+const EYES = {   // [top row, bottom row] for each 2x2 eye
+  fed: ["wk", "kk"], hungry: ["wk", "kw"], sleepy: ["pp", "kk"], celebrating: ["kk", "pp"],
+  worried: ["kw", "kk"], restless: ["kw", "kw"], asleep: ["pp", "kk"]
+};
+function px(x, y, c) { return `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`; }
+function drawPet(state) {
+  const eyes = EYES[state] || EYES.fed;
+  let out = '<g class="float">';
+  MAP.forEach((row, y) => [...row].forEach((ch, x) => {
+    let c = ch;
+    if (ch === "E") {
+      const left = x === 4 || x === 14;
+      c = eyes[y === 6 ? 0 : 1][left ? 0 : 1];
+    }
+    if (COLORS[c]) out += px(x, y, COLORS[c]);
+  }));
+  out += "</g>";
+  const star = (x, y, s, cls) => `<path class="glint ${cls}" fill="#FFFFFF" stroke="#D4A64A" stroke-width=".15" d="M${x} ${y - s}L${x + s * .3} ${y - s * .3}L${x + s} ${y}L${x + s * .3} ${y + s * .3}L${x} ${y + s}L${x - s * .3} ${y + s * .3}L${x - s} ${y}L${x - s * .3} ${y - s * .3}Z"/>`;
+  out += star(8.5, 9.5, 1.1, "") + star(11.5, 9.4, .8, "two");
+  const text = (x, y, t, size, color) => `<text x="${x}" y="${y}" font-family="Courier Prime, monospace" font-weight="700" font-size="${size}" fill="${color}">${t}</text>`;
+  if (state === "asleep") out += text(16, -0.5, "Zz", 3, "#4A1033");
+  if (state === "sleepy") out += text(17, 0, "z", 2.6, "#4A1033");
+  if (state === "worried") out += px(18, 3, "#BFD4EA") + px(18, 4, "#FFFFFF") + `<rect x="17.7" y="2.6" width="1.6" height="2.6" fill="none" stroke="#4A1033" stroke-width=".2"/>`;
+  if (state === "restless") out += text(-2, 9, "≋", 3, "#FF2D8A") + text(19.5, 9, "≋", 3, "#FF2D8A");
+  if (state === "hungry") out += text(-1.5, 18, "?", 3.2, "#E0202E");
+  if (state === "celebrating") out += star(-0.5, 1, 1.2, "") + star(20.5, 2, 1.4, "two") + star(19.5, 15, 1, "") + star(0, 14, .9, "two");
+  document.getElementById("pet").innerHTML = out;
+}
+
+// ---- fill the card (textContent only: notes are yours, never parsed as HTML)
+const $ = id => document.getElementById(id);
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+drawPet(d.state);
+$("table").textContent = "Table " + d.table;
+$("server").textContent = "Server " + d.name;
+$("week").textContent = d.week ? "Week of " + d.week : "";
+$("stamp").textContent = d.state;
+$("name").textContent = d.name;
+$("line").textContent = d.line;
+$("why").textContent = d.reason;
+if (d.details && d.details.length) {
+  const ul = el("ul");
+  d.details.forEach(x => ul.appendChild(el("li", "", "· " + x)));
+  $("why").appendChild(ul);
+}
+$("streak").textContent = d.streak;
+$("hungerbar").style.width = Math.max(0, Math.min(100, d.hunger)) + "%";
+$("hunger").textContent = "Hunger " + d.hunger + "%";
+$("watchn").textContent = d.watch.value;
+$("watchl").textContent = d.watch.label;
+
+const receipt = $("receipt");
+if (!d.feeds.length) receipt.appendChild(el("div", "empty", "Nothing ordered yet this week."));
+d.feeds.forEach(f => {
+  const r = el("div", "r");
+  r.append(el("span", "d", f.day), el("span", "k", f.kind), el("span", "note", f.note || ""), el("span", "t", f.time));
+  receipt.appendChild(r);
+});
+const totals = $("totals");
+Object.entries(d.totals).forEach(([k, v]) => {
+  if (!v) return;
+  const r = el("div", "r"); r.append(el("span", "", k), el("span", "", "x" + v)); totals.appendChild(r);
+});
+[["Tax", "0 tokens"], ["Total", d.feeds.length + " feeds"]].forEach(([a, b], i) => {
+  const r = el("div", i ? "r grand" : "r"); r.append(el("span", "", a), el("span", "", b)); totals.appendChild(r);
+});
+
+// ---- feed her: copy the CLI command
+const KINDS = ["shipped", "sent", "invoiced", "rested", "closed"];
+function say(msg) { $("toast").textContent = msg; }
+function fallbackCopy(text) {
+  const ta = el("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (err) { say("Copy did not work here (" + err.message + "). Type: " + text); }
+  document.body.removeChild(ta);
+  return ok;
+}
+KINDS.forEach(k => {
+  const b = el("button", "", k);
+  b.type = "button";
+  b.addEventListener("click", () => {
+    const cmd = `familiar feed ${k} ""`;
+    const done = () => say("Copied: " + cmd + "  Paste it in your terminal.");
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(cmd).then(done, err => { if (fallbackCopy(cmd)) done(); else say("Copy blocked (" + err.message + "). Type: " + cmd); });
+    } else if (fallbackCopy(cmd)) { done(); } else { say("Type this in your terminal: " + cmd); }
+  });
+  $("feedrow").appendChild(b);
+});
+$("foot").textContent = "pocket-familiar · Rocha Coded" + (d.generated ? " · printed " + d.generated : "");
+</script>
+</body>
+</html>

@@ -1,0 +1,469 @@
+#!/usr/bin/env python3
+"""familiar: a pixel leopard who eats what you ship.
+
+  familiar hatch [--name NAME]          hatch her (Lucky by default)
+  familiar feed KIND [note]             KIND is shipped, sent, invoiced, rested or closed
+  familiar status                       how she is and why
+  familiar card                         this week as a guest check, in the terminal
+  familiar web [--no-open]              writes ~/.familiar/familiar.html and opens it
+  familiar config [--ledger PATH] ...   optional settings (run with no flags to see them)
+
+State lives in ~/.familiar (set FAMILIAR_HOME to move it).
+"""
+import argparse
+import json
+import os
+import re
+import sys
+import tempfile
+import webbrowser
+from datetime import datetime, timedelta
+
+sys.dont_write_bytecode = True
+HERE = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, HERE)
+import mood  # noqa: E402
+
+PINK = (255, 45, 138)
+CANDY = (255, 179, 209)
+INK = (17, 17, 17)
+GOLD = (212, 166, 74)
+
+
+def home():
+    return os.path.expanduser(os.environ.get("FAMILIAR_HOME") or "~/.familiar")
+
+
+def state_path():
+    return os.path.join(home(), "state.json")
+
+
+def config_path():
+    return os.path.join(home(), "config.json")
+
+
+def now():
+    fixed = os.environ.get("FAMILIAR_NOW")  # for tests and example renders
+    if fixed:
+        return datetime.fromisoformat(fixed).astimezone()
+    return datetime.now().astimezone()
+
+
+def load_json(path, default):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except FileNotFoundError:
+        return default
+    except (OSError, ValueError) as err:
+        print(f"familiar: could not read {path}: {err}", file=sys.stderr)
+        return default
+
+
+def save_json(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), suffix=".tmp")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+    os.replace(tmp, path)
+
+
+def load_state():
+    return load_json(state_path(), None)
+
+
+def load_config():
+    return {**mood.DEFAULT_CONFIG, **load_json(config_path(), {})}
+
+
+def read_text(path):
+    if not path:
+        return None
+    try:
+        with open(os.path.expanduser(path), encoding="utf-8") as fh:
+            return fh.read()
+    except OSError:
+        return None
+
+
+def current_mood(state, config, t):
+    ledger = read_text(config.get("ledger"))
+    items = read_text(config.get("open_items"))
+    failing = mood.failing_from_ledger(ledger) if ledger else []
+    due = mood.due_open_items(items, t.date()) if items else []
+    return mood.decide(state, config, t, failing, due)
+
+
+# ---------------------------------------------------------------- colour
+
+def colour_on(stream=sys.stdout):
+    if os.environ.get("NO_COLOR"):
+        return False
+    return os.environ.get("FAMILIAR_COLOR") == "1" or stream.isatty()
+
+
+def paint(text, fg=None, bg=None, bold=False, on=True):
+    if not on:
+        return text
+    codes = []
+    if bold:
+        codes.append("1")
+    if fg:
+        codes.append("38;2;%d;%d;%d" % fg)
+    if bg:
+        codes.append("48;2;%d;%d;%d" % bg)
+    return f"\033[{';'.join(codes)}m{text}\033[0m"
+
+
+# ---------------------------------------------------------------- words
+
+LINES = {
+    "fed": "{name} is fed and purring.",
+    "hungry": "{name} is hungry. Ship something small.",
+    "sleepy": "{name} is sleepy. You have been at it a long time. Rest counts as food.",
+    "celebrating": "{name} is celebrating. The diamonds are out.",
+    "worried": "{name} is worried. Something you shipped is broken.",
+    "restless": "{name} is restless. Open items are past their default.",
+    "asleep": "{name} is asleep. Quiet hours. You could be too.",
+}
+EATS = {
+    "shipped": "Shipped. {name} ate it in one bite.",
+    "sent": "Sent. {name} licked the envelope.",
+    "invoiced": "Invoiced. {name} flashes the grill. ✧",
+    "rested": "Rested. {name} curls up next to you.",
+    "closed": "Closed. {name} batted it off the table.",
+}
+WATCH_LABELS = {k: f"{k.capitalize()} this month" for k in mood.KINDS}
+WATCH_LABELS.update({"streak": "Day streak", "week": "Feeds this week"})
+
+
+def week_start(t):
+    return (t - timedelta(days=t.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def week_feeds(state, t):
+    start = week_start(t)
+    return [f for f in state.get("feeds", []) if mood.parse_time(f["at"]) >= start]
+
+
+def totals(feeds):
+    return {k: sum(1 for f in feeds if f["kind"] == k) for k in mood.KINDS}
+
+
+def watch_value(state, config, t):
+    key = config.get("watch") or "shipped"
+    if key == "streak":
+        value = mood.streak(state, t)
+    elif key == "week":
+        value = len(week_feeds(state, t))
+    elif key in mood.KINDS:
+        value = sum(1 for f in state.get("feeds", [])
+                    if f["kind"] == key and mood.parse_time(f["at"]).astimezone(t.tzinfo).strftime("%Y-%m") == t.strftime("%Y-%m"))
+    else:
+        key, value = "shipped", 0
+    return WATCH_LABELS[key], value
+
+
+def ago(t, then):
+    mins = int((t - then).total_seconds() // 60)
+    if mins < 60:
+        return f"{mins}m ago"
+    if mins < 60 * 48:
+        return f"{mins // 60}h ago"
+    return f"{mins // 1440}d ago"
+
+
+def need_state():
+    state = load_state()
+    if state is None:
+        print("No familiar yet. Hatch her first:  familiar hatch", file=sys.stderr)
+        sys.exit(1)
+    return state
+
+
+# ---------------------------------------------------------------- commands
+
+def cmd_hatch(args):
+    existing = load_state()
+    if existing and not args.force:
+        print(f"{existing['name']} is already here. Use --force to start over (her history goes).")
+        return 1
+    name = args.name
+    if not name and sys.stdin.isatty():
+        name = input("Name her (press Enter for Lucky): ").strip()
+    name = (name or "Lucky")[:24]
+    t = now()
+    save_json(state_path(), {"version": 1, "name": name, "hatched_at": t.isoformat(),
+                             "feeds": [], "sessions": {}})
+    if not os.path.exists(config_path()):
+        save_json(config_path(), dict(mood.DEFAULT_CONFIG))
+    on = colour_on()
+    print(paint(mood.SPRITES["hungry"], PINK, bold=True, on=on) + f"  {name} hatched. She is hungry already.")
+    print("Feed her what you ship:  familiar feed shipped \"the newsletter\"")
+    return 0
+
+
+def cmd_feed(args):
+    state = need_state()
+    t = now()
+    entry = {"at": t.isoformat(), "kind": args.kind}
+    note = " ".join(args.note).strip()
+    if note:
+        entry["note"] = note[:120]
+    milestone = mood.milestone_for_new_feed(state, t)
+    if milestone:
+        entry["milestone"] = milestone
+    state.setdefault("feeds", []).append(entry)
+    save_json(state_path(), state)
+    on = colour_on()
+    m = current_mood(state, load_config(), t)
+    print(paint(m.sprite, PINK, bold=True, on=on) + "  " + EATS[args.kind].format(name=state["name"]))
+    if milestone:
+        print(paint(f"✧ {milestone} day streak. She is wearing the good diamonds.", GOLD, on=on))
+    return 0
+
+
+def cmd_status(args):
+    state = need_state()
+    config, t = load_config(), now()
+    m = current_mood(state, config, t)
+    on = colour_on()
+    print(paint(m.sprite, PINK, bold=True, on=on) + "  " + LINES[m.state].format(name=state["name"]))
+    feeds = state.get("feeds", [])
+    if feeds:
+        last = feeds[-1]
+        note = f' "{last["note"]}"' if last.get("note") else ""
+        print(f"  Last meal   {last['kind']}{note}, {ago(t, mood.parse_time(last['at']))}")
+    n = mood.streak(state, t)
+    print(f"  Streak      {n} day{'s' if n != 1 else ''}")
+    pct = mood.hunger_percent(state, config, t)
+    bar = "▰" * (pct // 10) + "▱" * (10 - pct // 10)
+    print(f"  Hunger      {paint(bar, PINK, on=on)} {pct}%")
+    tot = totals(week_feeds(state, t))
+    week = " · ".join(f"{v} {k}" for k, v in tot.items() if v) or "nothing yet"
+    print(f"  This week   {week}")
+    label, value = watch_value(state, config, t)
+    print(f"  Watching    {label}: {value}")
+    print(f"  Why         {m.reason}")
+    for d in m.details[:5]:
+        print(f"              · {d}")
+    return 0
+
+
+def cmd_card(args):
+    state = need_state()
+    config, t = load_config(), now()
+    m = current_mood(state, config, t)
+    feeds = week_feeds(state, t)
+    on = colour_on()
+    w = 34
+    rule = "-" * w
+
+    def row(left, right=""):
+        return " " + left.ljust(w - len(right) - 2)[: w - len(right) - 2] + " " + right
+
+    table = f"TABLE {t.isocalendar()[1]:02d}"
+    lines = [
+        "GUEST CHECK".center(w),
+        row(f"SERVER {state['name'].upper()}", table),
+        row(f"WEEK OF {week_start(t).strftime('%d %b %Y').upper()}", "GUESTS 1"),
+        rule,
+    ]
+    if not feeds:
+        lines.append(row("nothing ordered yet"))
+    for f in feeds:
+        ft = mood.parse_time(f["at"]).astimezone(t.tzinfo)
+        lines.append(row(f"{ft.strftime('%a').upper()}  {f['kind'].upper():<8} {f.get('note', '')}"))
+    lines.append(rule)
+    for k, v in totals(feeds).items():
+        if v:
+            lines.append(row(k.upper(), f"x{v}"))
+    n = mood.streak(state, t)
+    lines.append(row("STREAK", f"{n} DAY{'S' if n != 1 else ''}"))
+    lines.append(row("TAX", "0 TOKENS"))
+    lines.append(row("TOTAL", f"{len(feeds)} FEEDS"))
+    lines.append(rule)
+    lines.append(f"{m.sprite}  {m.state.upper()}".center(w))
+    lines.append("THANK YOU!".center(w))
+    for line in lines:
+        print(paint(line.ljust(w + 1), INK, CANDY, on=on))
+    return 0
+
+
+def web_data(state, config, t):
+    m = current_mood(state, config, t)
+    label, value = watch_value(state, config, t)
+    feeds = []
+    for f in week_feeds(state, t):
+        ft = mood.parse_time(f["at"]).astimezone(t.tzinfo)
+        feeds.append({"day": ft.strftime("%a").upper(), "time": ft.strftime("%H:%M"),
+                      "kind": f["kind"], "note": f.get("note", "")})
+    return {
+        "name": state["name"], "state": m.state, "reason": m.reason, "details": m.details[:5],
+        "sprite": m.sprite, "line": LINES[m.state].format(name=state["name"]),
+        "streak": mood.streak(state, t), "hunger": mood.hunger_percent(state, config, t),
+        "feeds": feeds, "totals": totals([{"kind": f["kind"]} for f in feeds]),
+        "watch": {"label": label, "value": value},
+        "week": week_start(t).strftime("%d %b %Y"), "table": f"{t.isocalendar()[1]:02d}",
+        "generated": t.strftime("%a %d %b, %H:%M"),
+    }
+
+
+def cmd_web(args):
+    state = need_state()
+    config, t = load_config(), now()
+    with open(os.path.join(HERE, "templates", "familiar.html"), encoding="utf-8") as fh:
+        template = fh.read()
+    payload = json.dumps(web_data(state, config, t), ensure_ascii=False)
+    payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    html = template.replace("/*__FAMILIAR_DATA__*/null", payload)
+    out = os.path.expanduser(args.out) if args.out else os.path.join(home(), "familiar.html")
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    with open(out, "w", encoding="utf-8") as fh:
+        fh.write(html)
+    print(f"Card written: {out}")
+    if not args.no_open and not webbrowser.open("file://" + os.path.abspath(out)):
+        print("Open that file in any browser to see her.")
+    return 0
+
+
+def cmd_config(args):
+    config = load_json(config_path(), {})
+    changed = False
+    for key in ("ledger", "open_items"):
+        value = getattr(args, key)
+        if value is not None:
+            config[key] = None if value in ("", "none", "off") else os.path.abspath(os.path.expanduser(value))
+            changed = True
+    if args.hunger_hours is not None:
+        config["hunger_hours"], changed = args.hunger_hours, True
+    if args.sleepy_hours is not None:
+        config["sleepy_hours"], changed = args.sleepy_hours, True
+    if args.quiet is not None:
+        q = None if args.quiet in ("", "none", "off") else args.quiet
+        if q and not re.fullmatch(r"\d{1,2}:\d{2}-\d{1,2}:\d{2}", q):
+            print("Quiet hours look like 23:00-07:00 (or off).", file=sys.stderr)
+            return 1
+        config["quiet_hours"], changed = q, True
+    if args.watch is not None:
+        if args.watch not in WATCH_LABELS:
+            print(f"Watch one of: {', '.join(WATCH_LABELS)}", file=sys.stderr)
+            return 1
+        config["watch"], changed = args.watch, True
+    if args.name:
+        state = need_state()
+        state["name"] = args.name[:24]
+        save_json(state_path(), state)
+        print(f"She answers to {state['name']} now.")
+    if changed:
+        save_json(config_path(), config)
+    for k, v in {**mood.DEFAULT_CONFIG, **config}.items():
+        print(f"  {k:<13} {v if v is not None else 'off'}")
+    print(f"  (saved in {config_path()})")
+    return 0
+
+
+def cmd_line(args):
+    """Status line: reads Claude Code's status JSON on stdin, prints one line."""
+    raw = "" if sys.stdin.isatty() else sys.stdin.read()
+    try:
+        info = json.loads(raw) if raw.strip() else {}
+    except ValueError:
+        info = {}
+    if not isinstance(info, dict):
+        info = {}
+    model = info.get("model")
+    model = (model.get("display_name") or model.get("id")) if isinstance(model, dict) else model
+    on = not os.environ.get("NO_COLOR")
+    state = load_state()
+    if state is None:
+        head = [paint(mood.EGG, PINK, bold=True, on=on), "an egg"]
+        tail = ["run familiar hatch"]
+    else:
+        config, t = load_config(), now()
+        m = current_mood(state, config, t)
+        head = [paint(m.sprite, PINK, bold=True, on=on), paint(state["name"], PINK, bold=True, on=on),
+                paint(f" {m.state} ", INK, CANDY, on=on)]
+        tail = [f"streak {mood.streak(state, t)}d"]
+    if model:
+        tail.append(str(model)[:30])
+    cost = info.get("cost")
+    usd = cost.get("total_cost_usd") if isinstance(cost, dict) else None
+    if isinstance(usd, (int, float)) and not isinstance(usd, bool):
+        tail.append(f"${usd:.2f}")
+    print(" ".join(head) + " · " + " · ".join(tail))
+    return 0
+
+
+def cmd_hook(args):
+    """Claude Code hooks. Never blocks, never fails loudly."""
+    raw = "" if sys.stdin.isatty() else sys.stdin.read()
+    try:
+        info = json.loads(raw) if raw.strip() else {}
+    except ValueError:
+        info = {}
+    if not isinstance(info, dict):
+        info = {}
+    state = load_state()
+    if state is None:
+        if args.event == "session-start":
+            print("pocket-familiar: no familiar yet. Run `familiar hatch` to meet her.")
+        return 0
+    t = now()
+    sid = str(info.get("session_id") or "default")
+    sessions = state.setdefault("sessions", {})
+    for key in [k for k, s in sessions.items() if t - mood.parse_time(s.get("last") or s["start"]) > timedelta(days=2)]:
+        del sessions[key]
+    if args.event == "session-start":
+        if info.get("source") in ("resume", "compact") and sid in sessions:
+            sessions[sid].update({"last": t.isoformat(), "ended": None})
+        else:
+            sessions[sid] = {"start": t.isoformat(), "last": t.isoformat(), "ended": None}
+        save_json(state_path(), state)
+        m = current_mood(state, load_config(), t)
+        print(f"{m.sprite} {LINES[m.state].format(name=state['name'])} ({m.reason})")
+        return 0
+    s = sessions.setdefault(sid, {"start": t.isoformat(), "ended": None})
+    s["last"] = t.isoformat()
+    s["minutes"] = int((t - mood.parse_time(s["start"])).total_seconds() // 60)
+    if info.get("hook_event_name") == "SessionEnd" or args.end:
+        s["ended"] = t.isoformat()
+    save_json(state_path(), state)
+    return 0
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(prog="familiar", description="A pixel leopard who eats what you ship.")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    h = sub.add_parser("hatch", help="hatch her")
+    h.add_argument("--name")
+    h.add_argument("--force", action="store_true")
+    f = sub.add_parser("feed", help="feed her a business action")
+    f.add_argument("kind", choices=mood.KINDS)
+    f.add_argument("note", nargs="*")
+    sub.add_parser("status", help="how she is and why")
+    sub.add_parser("card", help="this week as a guest check")
+    w = sub.add_parser("web", help="write and open the web card")
+    w.add_argument("--out")
+    w.add_argument("--no-open", action="store_true")
+    c = sub.add_parser("config", help="optional settings")
+    c.add_argument("--ledger", help="probe ledger (JSON or PASS/FAIL log); off to clear")
+    c.add_argument("--open-items", dest="open_items", help="open items markdown; off to clear")
+    c.add_argument("--hunger-hours", type=float)
+    c.add_argument("--sleepy-hours", type=float)
+    c.add_argument("--quiet", help="quiet hours like 23:00-07:00, or off")
+    c.add_argument("--watch", help="shipped, sent, invoiced, rested, closed, streak or week")
+    c.add_argument("--name", help="rename her")
+    sub.add_parser("line", help=argparse.SUPPRESS)
+    k = sub.add_parser("hook", help=argparse.SUPPRESS)
+    k.add_argument("event", choices=("session-start", "stop"))
+    k.add_argument("--end", action="store_true")
+    args = p.parse_args(argv)
+    handlers = {"hatch": cmd_hatch, "feed": cmd_feed, "status": cmd_status, "card": cmd_card,
+                "web": cmd_web, "config": cmd_config, "line": cmd_line, "hook": cmd_hook}
+    return handlers[args.cmd](args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,6 @@
+{
+  "probes": [
+    {"name": "booking-page-loads", "status": "pass", "checked": "2026-10-26T07:50:00+08:00"},
+    {"name": "newsletter-signup", "status": "fail", "checked": "2026-10-26T07:50:00+08:00"}
+  ]
+}

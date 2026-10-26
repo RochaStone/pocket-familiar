@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "Lucky",
+  "hatched_at": "2026-10-12T09:00:00+08:00",
+  "feeds": [
+    {"at": "2026-10-17T10:12:00+08:00", "kind": "sent", "note": "podcast pitch"},
+    {"at": "2026-10-18T19:40:00+08:00", "kind": "rested", "note": "beach, phone off"},
+    {"at": "2026-10-19T09:05:00+08:00", "kind": "shipped", "note": "the newsletter"},
+    {"at": "2026-10-19T15:30:00+08:00", "kind": "closed", "note": "website copy"},
+    {"at": "2026-10-20T11:00:00+08:00", "kind": "sent", "note": "collab email"},
+    {"at": "2026-10-21T08:45:00+08:00", "kind": "rested", "note": "slow morning"},
+    {"at": "2026-10-21T17:20:00+08:00", "kind": "shipped", "note": "carousel on IG"},
+    {"at": "2026-10-22T13:10:00+08:00", "kind": "closed", "note": "booking page"},
+    {"at": "2026-10-23T16:05:00+08:00", "kind": "invoiced", "note": "brand day, paid in full", "milestone": 7}
+  ],
+  "sessions": {}
+}

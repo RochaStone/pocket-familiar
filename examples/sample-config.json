@@ -1,0 +1,8 @@
+{
+  "hunger_hours": 24,
+  "sleepy_hours": 3,
+  "quiet_hours": "23:00-07:00",
+  "ledger": null,
+  "open_items": null,
+  "watch": "invoiced"
+}
