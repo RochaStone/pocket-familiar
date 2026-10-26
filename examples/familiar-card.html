@@ -84,6 +84,13 @@
     border: 3px solid var(--red); border-radius: 6px; padding: 6px 8px 4px; background: rgba(255,225,236,.6);
     text-transform: uppercase; letter-spacing: .02em;
   }
+  .slogan { font-family: var(--marker); color: var(--red); font-size: 22px; text-align: center; margin: 10px 0 2px; transform: rotate(-1.5deg); }
+  .sticker {
+    position: absolute; left: -6px; bottom: 18px; transform: rotate(-12deg);
+    font-family: var(--label); font-weight: 700; letter-spacing: .14em; font-size: 13px; color: var(--white);
+    background: var(--plum); border: 3px solid var(--white); border-radius: 999px; padding: 8px 12px;
+    box-shadow: 0 4px 10px -4px rgba(74,16,51,.6);
+  }
   h1 { font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 58px; line-height: 1; margin: 12px 0 2px; color: var(--ink); text-align: center; letter-spacing: -.01em; }
   .line { text-align: center; font-size: 18px; margin: 4px 0 2px; }
   .why { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--plum); margin: 0 0 16px; }
@@ -128,6 +135,7 @@
 <body>
 <main class="check" aria-label="Your familiar">
   <div class="head"><span class="label title">Guest Check</span><span class="label" id="table"></span></div>
+  <div class="slogan">BUILD YOUR FOUNDER WORLD</div>
   <div class="sub"><span class="label" id="server"></span><span class="label" id="week"></span></div>
 
   <div class="stage">
@@ -136,6 +144,7 @@
       <div class="buttons" aria-hidden="true"><span></span><span></span><span></span></div>
     </div>
     <div class="stamp" id="stamp"></div>
+    <div class="sticker" id="sticker" hidden>I AM SO LUCKY</div>
   </div>
 
   <h1 id="name"></h1>
@@ -231,6 +240,7 @@ $("table").textContent = "Table " + d.table;
 $("server").textContent = "Server " + d.name;
 $("week").textContent = d.week ? "Week of " + d.week : "";
 $("stamp").textContent = d.state;
+$("sticker").hidden = d.state !== "celebrating";
 $("name").textContent = d.name;
 $("line").textContent = d.line;
 $("why").textContent = d.reason;

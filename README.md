@@ -116,18 +116,22 @@ An open item is a markdown table row or a `- [ ]` line with a date in it. Struck
 
 Her memories live in `~/.familiar` on your computer. Nothing is sent anywhere.
 
-## Made by
-
-[Rocha](https://thrivingera.com)
-Brand Alchemist & AI Architect
-Author of Brand Alchemy in the Thriving Era
-Creator of [Conscious Founder OS](https://founders.thrivingera.com)
-Founder, Thriving Era Studio
-
-Instagram [@rocheverse](https://instagram.com/rocheverse) · Substack [rochastone.substack.com](https://rochastone.substack.com)
-
 Not affiliated with any other terminal pet or familiar project.
 
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+## Made by Rocha
+
+Rocha \
+Brand Alchemist & AI Architect \
+Author of *Brand Alchemy in the Thriving Era* \
+Creator of [Conscious Founder OS](https://founders.thrivingera.com) \
+Founder, [Thriving Era Studio](https://thrivingera.com)
+
+I take female founders AI native in 7 days, and I build what they need next. \
+Start with the audit: [thrivingera.com/audit](https://thrivingera.com/audit). \
+Or book an exploratory call: [calendly.com/rochelle-thrivingera/exploratory-call](https://calendly.com/rochelle-thrivingera/exploratory-call). It is where we decide if we work together.
+
+[Instagram @rocheverse](https://instagram.com/rocheverse) · [Substack](https://rochastone.substack.com) · [LinkedIn](https://www.linkedin.com/in/rochellelivingstonecosmic) · [More free tools](https://thrivingera.com/free) · [All tools on GitHub](https://github.com/RochaStone)

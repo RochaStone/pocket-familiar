@@ -220,7 +220,7 @@ def cmd_feed(args):
     m = current_mood(state, load_config(), t)
     print(paint(m.sprite, PINK, bold=True, on=on) + "  " + EATS[args.kind].format(name=state["name"]))
     if milestone:
-        print(paint(f"✧ {milestone} day streak. She is wearing the good diamonds.", GOLD, on=on))
+        print(paint(f"✧ {milestone} day streak. EVERYTHING WORKS OUT FOR ME.", GOLD, on=on))
     return 0
 
 
@@ -266,6 +266,7 @@ def cmd_card(args):
     table = f"TABLE {t.isocalendar()[1]:02d}"
     lines = [
         "GUEST CHECK".center(w),
+        "BUILD YOUR FOUNDER WORLD".center(w),
         row(f"SERVER {state['name'].upper()}", table),
         row(f"WEEK OF {week_start(t).strftime('%d %b %Y').upper()}", "GUESTS 1"),
         rule,
@@ -285,6 +286,8 @@ def cmd_card(args):
     lines.append(row("TOTAL", f"{len(feeds)} FEEDS"))
     lines.append(rule)
     lines.append(f"{m.sprite}  {m.state.upper()}".center(w))
+    if m.state == "celebrating":
+        lines.append("I AM SO LUCKY".center(w))
     lines.append("THANK YOU!".center(w))
     for line in lines:
         print(paint(line.ljust(w + 1), INK, CANDY, on=on))
