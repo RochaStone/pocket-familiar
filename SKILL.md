@@ -7,24 +7,30 @@ description: A pixel leopard familiar who eats business actions, not tokens. Use
 
 A pink pixel leopard with a diamond grill. She lives in the Claude Code status line and in a web card. She eats what the user ships: a post, an email, an invoice, a rest day, a closed item. Her default name is Lucky. The user may have renamed her, so read her name from `familiar status`.
 
-## Install
+## How to talk to her
 
-In Claude Code (status line, hooks and the command):
-```sh
-bash ~/.claude/skills/pocket-familiar/install.sh
-familiar hatch
-```
-Tell the user to restart Claude Code to see her in the status line. The installer backs up `~/.claude/settings.json` first and prints how to undo (`bash ~/.claude/skills/pocket-familiar/uninstall.sh`).
+She may never have opened a terminal. Be warm, certain and kind. Ask one question at a time and wait for the answer. Reflect her answer back in one sentence. Say what you are about to do before you do it. End every step with what she will see and what she can do next. Never say "simply" or "just". If a step needs her to type in the terminal, tell her exactly what to type and what she will see.
 
-Anywhere else with a terminal, including Claude Cowork: the status line and hooks are Claude Code only. The command and the web card work anywhere with Python 3.10+.
-```sh
-python3 <this skill folder>/familiar hatch
-```
-In Cowork, set `FAMILIAR_HOME` to a folder the user gave you access to, so she remembers between tasks:
-```sh
-export FAMILIAR_HOME="<the user's folder>/.familiar"
-```
-If `familiar` is not on the PATH, run `python3 <this skill folder>/familiar` instead.
+## Install, as a guided flow
+
+1. Ask: "Are you in Claude Code on your computer, or in Claude Cowork?" Wait.
+2. **Claude Code.** Say: "I'm going to set Lucky up and connect her to the bottom of your Claude Code window. I'll back up your settings first." Then run:
+   ```sh
+   bash ~/.claude/skills/pocket-familiar/install.sh
+   ```
+   Tell her what it printed in plain words ("she's installed, and your old settings are saved").
+3. Ask: "What would you like to call her? Lucky is her name unless you pick another." Wait. Reflect it back ("Lovely, she's Diamond."). Then run:
+   ```sh
+   familiar hatch --name "<her answer>"
+   ```
+   If `familiar` is not found, run `python3 ~/.claude/skills/pocket-familiar/familiar hatch --name "<her answer>"` instead. Show her the hatch line.
+4. Say: "Close Claude Code and open it again. You'll see her at the bottom of the window, with her mood next to her name." Then: "Tell me something you did today and I'll feed her."
+5. **Cowork.** The status line and hooks are Claude Code only. The command and the web card work in Cowork. Say what you are about to do, then set her home inside the folder she gave you so Lucky remembers her between tasks:
+   ```sh
+   export FAMILIAR_HOME="<the folder she gave you>/.familiar"
+   python3 <this skill folder>/familiar hatch --name "<her answer>"
+   ```
+   Then run `python3 <this skill folder>/familiar web --no-open` and give her the card file. Tell her: "Open this in your browser to see her. From now on, tell me what you did and I'll feed her."
 
 ## Make it hers (style.json)
 

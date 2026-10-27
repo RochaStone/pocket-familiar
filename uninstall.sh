@@ -44,6 +44,13 @@ print("✓ hooks removed from " + settings_path)
 PY
 fi
 
+for RC in "$HOME/.zshrc" "$HOME/.bashrc"; do
+  if [ -f "$RC" ] && grep -q "# pocket-familiar PATH" "$RC"; then
+    cp "$RC" "$RC.pocket-familiar-backup-$(date +%Y%m%d%H%M%S)"
+    grep -v "# pocket-familiar PATH" "$RC" > "$RC.tmp" && mv "$RC.tmp" "$RC"
+    echo "✓ removed the PATH line from $RC"
+  fi
+done
 for d in "$HOME/.local/bin" "/usr/local/bin"; do
   if [ -L "$d/familiar" ] && [ "$(readlink "$d/familiar")" = "$DIR/familiar" ]; then
     rm "$d/familiar"

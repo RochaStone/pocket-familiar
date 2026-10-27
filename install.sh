@@ -26,8 +26,13 @@ if [ -n "$BIN" ]; then
   echo "✓ familiar linked into $BIN"
   case ":$PATH:" in
     *":$BIN:"*) ;;
-    *) echo "  $BIN is not on your PATH yet. Add this line to your ~/.zshrc or ~/.bashrc:"
-       echo "    export PATH=\"$BIN:\$PATH\"" ;;
+    *) # Teach the terminal where she lives, once, in your shell profile (uninstall.sh takes it out again)
+       case "${SHELL:-}" in *bash) RC="$HOME/.bashrc" ;; *) RC="$HOME/.zshrc" ;; esac
+       if ! grep -q "# pocket-familiar PATH" "$RC" 2>/dev/null; then
+         printf '\nexport PATH="%s:$PATH"  # pocket-familiar PATH\n' "$BIN" >> "$RC"
+       fi
+       echo "✓ added $BIN to your PATH in $RC"
+       echo "  Open a new terminal window so it takes effect." ;;
   esac
 else
   echo "! Could not find a writable bin folder. Run her directly: python3 \"$DIR/familiar\" status"

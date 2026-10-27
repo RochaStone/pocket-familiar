@@ -13,6 +13,35 @@ She gets worried when something you shipped breaks.
 She gets sleepy when you have been at it too long.
 Every week she prints you a guest check of everything you fed her.
 
+## Start here
+
+Five steps, about five minutes. You need a Mac or Linux computer and Claude Code.
+The **terminal** is the window where you type instructions to your computer. On a Mac, press Command and Space together, type Terminal, and press Enter.
+
+1. **Copy Lucky onto your computer.** To **clone** is to copy a project from GitHub into a folder on your computer.
+   ```sh
+   git clone https://github.com/RochaStone/pocket-familiar ~/.claude/skills/pocket-familiar
+   ```
+   You will see "Cloning into" and then your prompt comes back. That means it worked.
+2. **Set her up.** This connects her to Claude Code and teaches your terminal the word `familiar`. It saves a backup of your Claude Code settings first.
+   ```sh
+   bash ~/.claude/skills/pocket-familiar/install.sh
+   ```
+   You will see a few green ticks and "Next: hatch her."
+3. **Open a new terminal window**, so it knows the new word. Then hatch her.
+   ```sh
+   familiar hatch
+   ```
+   You will see Lucky hatch. Press Enter to keep the name Lucky, or type a new name first. She tells you she is hungry already.
+4. **Feed her your first win.** Pick something you did today.
+   ```sh
+   familiar feed shipped "the newsletter"
+   ```
+   You will see her eat it in one bite.
+5. **Restart Claude Code.** You will see her at the bottom of the window, with her mood next to her name. That strip is the **status line**. From now on you can tell Claude "I sent the invoice" and Claude feeds her for you.
+
+Using Claude Cowork instead? Go to [Claude Cowork](#claude-cowork) below. Three steps, no terminal.
+
 ## Why she eats actions, not tokens
 
 When Claude Code shipped its own little buddy, a wave of terminal pets followed. Every one of them eats tokens or commits, so they grow fat on busywork and reward you for keeping the machine running. Lucky is a founder's familiar, not a developer's. She only eats the things that move a business: the newsletter that went out, the pitch you sent, the invoice, the item you finally closed, and the rest day you took on purpose. Rest counts as food. The tax line on her receipt always reads 0 tokens.
@@ -27,7 +56,7 @@ You need Python 3.10 or newer. Nothing else.
 | [Any terminal](#any-terminal) | clone anywhere, run `install.sh --cli-only` | the `familiar` command and the web card |
 | [Claude Cowork](#claude-cowork) | upload `pocket-familiar.zip` as a skill | Claude feeds her for you and prints her card |
 
-The status line and the hooks are Claude Code only. Everything else works anywhere with a terminal.
+The status line and the hooks are Claude Code only. **Hooks** are small scripts Claude Code runs on its own when a session starts and stops; hers note how long you have been working. Everything else works anywhere with a terminal.
 
 ### Claude Code
 ```sh
@@ -36,6 +65,7 @@ bash ~/.claude/skills/pocket-familiar/install.sh
 familiar hatch
 ```
 Restart Claude Code. She is at the bottom of the window.
+The installer also adds one line to your shell profile (`~/.zshrc` on a Mac) so your terminal can find `familiar`. Open a new terminal window after installing.
 The installer backs up your `~/.claude/settings.json` before it touches anything, keeps your other hooks, and saves your old status line so it can come back.
 To undo: `bash ~/.claude/skills/pocket-familiar/uninstall.sh`.
 
@@ -47,7 +77,7 @@ familiar hatch
 ```
 
 ### Claude Cowork
-1. Download `pocket-familiar.zip` from the latest release.
+1. Download `pocket-familiar.zip` from the latest release. A **zip** is one file that holds a whole folder.
 2. In the Claude desktop app: Customize > Skills, then + > Create skill > Upload a skill, and pick the zip.
 3. Give your Cowork task a folder to keep her in, then say: "Hatch my pocket familiar."
 4. From then on, tell Claude what you did. "I shipped the newsletter." Claude feeds her.
@@ -62,7 +92,7 @@ familiar feed rested "beach, phone off"
 familiar feed closed "booking page"
 ```
 
-Or just tell Claude. "Invoice is out." Claude feeds her and tells you so.
+Or tell Claude in your own words. "Invoice is out." Claude feeds her and tells you so.
 
 ## Her moods
 
@@ -126,6 +156,16 @@ Put yours in your working folder or in `~/.rocha-coded/style.json`, or ask Claud
 Her memories live in `~/.familiar` on your computer. Nothing is sent anywhere.
 
 Not affiliated with any other terminal pet or familiar project.
+
+## If it goes wrong
+
+This happens to everyone the first time. Each one has a quick fix.
+
+- **"command not found: familiar".** Your terminal has not learned the new word yet. Open a new terminal window and try again. If it still says this, run `python3 ~/.claude/skills/pocket-familiar/familiar hatch` instead; it does the same thing.
+- **"command not found: git" or a box asking to install developer tools.** Your Mac needs its free developer tools once. Click Install in the box, wait for it to finish, then run step 1 again.
+- **You do not see her at the bottom of Claude Code.** Close Claude Code completely and open it again. If you see an egg, she has not hatched yet: run `familiar hatch`. To check her any time, run `familiar status`.
+
+If you want her gone, `bash ~/.claude/skills/pocket-familiar/uninstall.sh` takes everything back out and puts your old settings back.
 
 ## Licence
 
