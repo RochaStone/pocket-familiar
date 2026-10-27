@@ -116,11 +116,11 @@ class Cli(unittest.TestCase):
             a = fh.read()
         with open(mine) as fh:
             b = fh.read()
-        self.assertIn('"hero": "#FF2D8A"', a)
+        self.assertIn('"hero": "#50163C"', a)
         self.assertIn('"celebrate": "I AM SO LUCKY"', a)
         self.assertIn('"hero": "#0B7A75"', b)
         self.assertIn('"celebrate": "SHE PURRS FOR ME"', b)
-        self.assertIn('"plum": "#4A1033"', b)  # blank keys fall back key by key
+        self.assertIn('"plum": "#50163C"', b)  # blank keys fall back key by key
         card = self.run_cli("card").stdout
         self.assertIn("SHE PURRS FOR ME", card)
         self.assertIn("TO DO: TEST LINE", card)
@@ -128,7 +128,7 @@ class Cli(unittest.TestCase):
         env = {**self.env, "FAMILIAR_COLOR": "1"}
         env.pop("NO_COLOR")
         coloured = subprocess.run([sys.executable, CLI, "status"], capture_output=True, text=True, env=env).stdout
-        self.assertIn("38;2;11;122;117", coloured)  # #0B7A75 in the terminal too
+        self.assertIn("38;2;159;226;221", coloured)  # accent #9FE2DD in the terminal too
 
     def test_user_style_never_borrows_her_words(self):
         mine = os.path.join(self.tmp.name, "style.json")
@@ -142,8 +142,8 @@ class Cli(unittest.TestCase):
         with open(out) as fh:
             html = fh.read()
         self.assertIn('"hero": "#0B7A75"', html)
-        self.assertIn('"plum": "#4A1033"', html)              # palette may fall back
-        self.assertIn('"masthead": "Playfair Display"', html)  # fonts may fall back
+        self.assertIn('"plum": "#50163C"', html)              # palette may fall back
+        self.assertIn('"masthead": "Fraunces"', html)  # fonts may fall back
         for hers in ("I AM SO LUCKY", "EVERYTHING WORKS OUT", "BUILD YOUR FOUNDER WORLD", "Rocha", "@rocheverse"):
             self.assertNotIn(hers, html.split("const DATA")[1].split("const SAMPLE")[0])
         card = self.run_cli("card").stdout
@@ -161,7 +161,7 @@ class Cli(unittest.TestCase):
         self.run_cli("web", "--no-open", "--out", out)
         with open(out) as fh:
             html = fh.read()
-        self.assertIn('"hero": "#FF2D8A"', html)
+        self.assertIn('"hero": "#50163C"', html)
         self.assertNotIn("<script>\"", html)
 
 

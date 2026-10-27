@@ -27,22 +27,24 @@ import style as house  # noqa: E402
 
 # Terminal colours and words come from the shared style.json (see style.py). These are
 # Rocha's defaults until apply_style() runs.
-PINK = (255, 45, 138)
-CANDY = (255, 179, 209)
-INK = (17, 17, 17)
-GOLD = (212, 166, 74)
+CANDY = (254, 157, 202)   # accent: sprites, bars, the mood chip
+PLUM = (80, 22, 60)       # hero is the ground: the status line and receipt sit on it
+CREAM = (255, 247, 244)   # paper: text on plum
+INK = (59, 18, 48)
+GOLD = (233, 185, 73)
 STYLE = {}
 STYLE_PATH = ""
 
 
 def apply_style(config):
-    global PINK, CANDY, INK, GOLD, STYLE, STYLE_PATH
+    global CANDY, PLUM, CREAM, INK, GOLD, STYLE, STYLE_PATH
     STYLE, STYLE_PATH = house.load(config.get("style"))
     pal = STYLE.get("palette", {})
-    PINK = house.rgb(pal.get("hero", "#FF2D8A"))
-    CANDY = house.rgb(pal.get("accent", "#FFB3D1"))
-    INK = house.rgb(pal.get("ink", "#111111"))
-    GOLD = house.rgb(pal.get("gold", "#D4A64A"))
+    CANDY = house.rgb(pal.get("accent", "#FE9DCA"))
+    PLUM = house.rgb(pal.get("hero", "#50163C"))
+    CREAM = house.rgb(pal.get("paper", "#FFF7F4"))
+    INK = house.rgb(pal.get("ink", "#3B1230"))
+    GOLD = house.rgb(pal.get("gold", "#E9B949"))
 
 
 def line_of(key, fallback=""):
@@ -196,7 +198,7 @@ def cmd_hatch(args):
     if not os.path.exists(config_path()):
         save_json(config_path(), dict(mood.DEFAULT_CONFIG))
     on = colour_on()
-    print(paint(mood.SPRITES["hungry"], PINK, bold=True, on=on) + f"  {name} hatched. She is hungry already.")
+    print(paint(mood.SPRITES["hungry"], CANDY, bold=True, on=on) + f"  {name} hatched. She is hungry already.")
     print("Feed her what you ship:  familiar feed shipped \"the newsletter\"")
     return 0
 
@@ -215,7 +217,7 @@ def cmd_feed(args):
     save_json(state_path(), state)
     on = colour_on()
     m = current_mood(state, load_config(), t)
-    print(paint(m.sprite, PINK, bold=True, on=on) + "  " + EATS[args.kind].format(name=state["name"]))
+    print(paint(m.sprite, CANDY, bold=True, on=on) + "  " + EATS[args.kind].format(name=state["name"]))
     if milestone:
         print(paint(f"✧ {milestone} day streak. {line_of('affirm')}".rstrip(), GOLD, on=on))
     return 0
@@ -226,7 +228,7 @@ def cmd_status(args):
     config, t = load_config(), now()
     m = current_mood(state, config, t)
     on = colour_on()
-    print(paint(m.sprite, PINK, bold=True, on=on) + "  " + LINES[m.state].format(name=state["name"]))
+    print(paint(m.sprite, CANDY, bold=True, on=on) + "  " + LINES[m.state].format(name=state["name"]))
     feeds = state.get("feeds", [])
     if feeds:
         last = feeds[-1]
@@ -235,8 +237,9 @@ def cmd_status(args):
     n = mood.streak(state, t)
     print(f"  Streak      {n} day{'s' if n != 1 else ''}")
     pct = mood.hunger_percent(state, config, t)
-    bar = "▰" * (pct // 10) + "▱" * (10 - pct // 10)
-    print(f"  Hunger      {paint(bar, PINK, on=on)} {pct}%")
+    fed = 100 - pct   # a full bar means fed
+    bar = "▰" * (fed // 10) + "▱" * (10 - fed // 10)
+    print(f"  Fed         {paint(bar, CANDY, on=on)} {fed}%")
     tot = totals(week_feeds(state, t))
     week = " · ".join(f"{v} {k}" for k, v in tot.items() if v) or "nothing yet"
     print(f"  This week   {week}")
@@ -287,7 +290,7 @@ def cmd_card(args):
         lines.append(line_of("celebrate")[:w].center(w))
     lines.append("THANK YOU!".center(w))
     for line in lines:
-        print(paint(line.ljust(w + 1), INK, CANDY, on=on))
+        print(paint(line.ljust(w + 1), CREAM, PLUM, on=on))
     return 0
 
 
@@ -390,13 +393,13 @@ def cmd_line(args):
     on = not os.environ.get("NO_COLOR")
     state = load_state()
     if state is None:
-        head = [paint(mood.EGG, PINK, bold=True, on=on), "an egg"]
+        head = [paint(mood.EGG, CANDY, PLUM, bold=True, on=on), paint("an egg", CREAM, PLUM, on=on)]
         tail = ["run familiar hatch"]
     else:
         config, t = load_config(), now()
         m = current_mood(state, config, t)
-        head = [paint(m.sprite, PINK, bold=True, on=on), paint(state["name"], PINK, bold=True, on=on),
-                paint(f" {m.state} ", INK, CANDY, on=on)]
+        head = [paint(m.sprite, CANDY, PLUM, bold=True, on=on), paint(state["name"], CREAM, PLUM, bold=True, on=on),
+                paint(f" {m.state} ", INK, CANDY, bold=True, on=on)]
         tail = [f"streak {mood.streak(state, t)}d"]
     if model:
         tail.append(str(model)[:30])
@@ -404,7 +407,8 @@ def cmd_line(args):
     usd = cost.get("total_cost_usd") if isinstance(cost, dict) else None
     if isinstance(usd, (int, float)) and not isinstance(usd, bool):
         tail.append(f"${usd:.2f}")
-    print(" ".join(head) + " · " + " · ".join(tail))
+    gap = paint(" ", CREAM, PLUM, on=on)   # the whole line sits on the plum ground
+    print(gap + gap.join(head) + paint(" · " + " · ".join(tail) + " ", CREAM, PLUM, on=on))
     return 0
 
 

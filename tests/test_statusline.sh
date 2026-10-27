@@ -27,5 +27,5 @@ for input in "" "not json" "[1,2]" '{"model":"plain-string"}'; do
 done
 
 colour="$(env -u NO_COLOR bash "$ROOT/statusline.sh" < "$ROOT/tests/fixtures/statusline-input.json")"
-ok "hot pink ANSI when colour is on" '[[ "$colour" == *"38;2;255;45;138"* ]]'
+ok "candy sprite on the plum ground when colour is on" '[[ "$colour" == *"38;2;254;157;202;48;2;80;22;60"* ]]'
 exit $fail

@@ -99,7 +99,7 @@ An open item is a markdown table row or a `- [ ]` line with a date in it. Struck
 ## Make it yours
 
 Her colours, fonts and lines come from one `style.json`, and the same file styles every Rocha Coded tool.
-Two come in the box: `examples/style.rocha-coded.json` (Rocha's look, the pink you see above) and `style.example.json` (blank, for yours). `STYLE.md` explains every key.
+Two come in the box: `examples/style.rocha-coded.json` (Rocha's current look: plum, blush, candy pink and gold, as above) and `style.example.json` (blank, for yours). `STYLE.md` explains every key.
 Put yours in your working folder or in `~/.rocha-coded/style.json`, or ask Claude to make one with you from a few references.
 
 ## See her

@@ -8,131 +8,129 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
   :root {
-    --hot: #FF2D8A; --candy: #FFB3D1; --paper: #FFE1EC; --cream: #F6EFE4; --ink: #111111;
-    --red: #E0202E; --plum: #4A1033; --gold: #D4A64A; --blue: #BFD4EA; --white: #FFFFFF;
-    --serif: "Bodoni Moda", "Playfair Display", Didot, Georgia, serif;
-    --label: "Archivo Narrow", "Arial Narrow", sans-serif;
-    --body: "Newsreader", Georgia, serif;
-    --mono: "Courier Prime", "Courier New", monospace;
+    /* The current Rocheverse (v2). Overwritten at load from style.json. hero is the GROUND. */
+    --ground: #50163C; --blush: #FFE3F1; --cream: #FFF7F4; --ink: #3B1230; --candy: #FE9DCA;
+    --magenta: #C2246E; --plum: #50163C; --wine: #682047; --gold: #E9B949;
+    --serif: "Fraunces", Georgia, serif;
+    --label: "Bricolage Grotesque", system-ui, sans-serif;
+    --body: "Fraunces", Georgia, serif;
+    --mono: "DM Mono", ui-monospace, Menlo, monospace;
     --marker: "Permanent Marker", "Marker Felt", cursive;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background-color: var(--cream);
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .29 0 0 0 0 .06 0 0 0 0 .2 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-color: var(--ground);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     color: var(--ink); font-family: var(--body);
     min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
     padding: 40px 16px 56px;
   }
   .check {
     width: 100%; max-width: 420px; position: relative; transform: rotate(-0.8deg);
-    background-color: var(--paper);
-    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(255,45,138,.22) 27px 28px);
-    box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 18px 34px -12px rgba(74,16,51,.38), 0 3px 8px rgba(74,16,51,.12);
+    background-color: var(--blush);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in srgb, var(--magenta) 20%, transparent) 27px 28px);
+    box-shadow: 0 22px 40px -14px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.25);   /* a print on a desk */
     padding: 22px 24px 40px;
     -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
             mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
   }
-  .check::before { /* red margin rule like a real pad */
-    content: ""; position: absolute; top: 0; bottom: 0; left: 16px; width: 1px; background: rgba(224,32,46,.35);
+  .check::before { /* margin rule like a real pad */
+    content: ""; position: absolute; top: 0; bottom: 0; left: 16px; width: 1px; background: color-mix(in srgb, var(--magenta) 40%, transparent);
   }
-  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--hot); padding-bottom: 6px; }
-  .label { font-family: var(--label); text-transform: uppercase; letter-spacing: .16em; font-weight: 700; font-size: 12px; }
-  .head .title { color: var(--hot); font-size: 15px; letter-spacing: .28em; }
-  .sub { display: flex; justify-content: space-between; margin-top: 6px; color: var(--plum); font-size: 11px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--gold); padding-bottom: 6px; }
+  .label { font-family: var(--label); text-transform: uppercase; letter-spacing: .12em; font-weight: 800; font-size: 11px; }
+  .head .title { color: var(--wine); font-size: 14px; letter-spacing: .22em; }
+  .sub { display: flex; justify-content: space-between; margin-top: 6px; color: var(--wine); font-size: 10px; }
 
   .stage { display: grid; grid-template-columns: 1fr; justify-items: center; margin: 22px 0 6px; position: relative; }
   .egg {
     width: 236px; height: 270px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
-    background-color: var(--hot);
+    background-color: var(--plum);
     background-image:
-      radial-gradient(circle at 18% 22%, var(--plum) 0 5px, transparent 6px),
-      radial-gradient(circle at 80% 18%, var(--plum) 0 4px, transparent 5px),
-      radial-gradient(circle at 12% 62%, var(--plum) 0 4px, transparent 5px),
-      radial-gradient(circle at 88% 58%, var(--plum) 0 6px, transparent 7px),
-      radial-gradient(circle at 30% 90%, var(--plum) 0 4px, transparent 5px),
-      radial-gradient(circle at 72% 88%, var(--plum) 0 5px, transparent 6px),
-      radial-gradient(circle at 50% 8%, var(--plum) 0 3px, transparent 4px),
-      radial-gradient(ellipse at 32% 24%, rgba(255,255,255,.45), transparent 40%);
-    box-shadow: inset -10px -14px 0 rgba(74,16,51,.18), inset 8px 10px 0 rgba(255,255,255,.18), 0 10px 18px -8px rgba(74,16,51,.5);
+      radial-gradient(circle at 18% 22%, var(--wine) 0 6px, transparent 7px),
+      radial-gradient(circle at 80% 18%, var(--wine) 0 5px, transparent 6px),
+      radial-gradient(circle at 12% 62%, var(--wine) 0 5px, transparent 6px),
+      radial-gradient(circle at 88% 58%, var(--wine) 0 7px, transparent 8px),
+      radial-gradient(circle at 30% 90%, var(--wine) 0 5px, transparent 6px),
+      radial-gradient(circle at 72% 88%, var(--wine) 0 6px, transparent 7px);
+    box-shadow: inset -10px -14px 0 rgba(0,0,0,.22), inset 8px 10px 0 rgba(255,255,255,.06), 0 12px 20px -8px rgba(0,0,0,.45);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   }
   .screen {
-    width: 150px; height: 140px; border-radius: 14px; background: var(--blue);
-    border: 5px solid var(--plum); box-shadow: inset 0 0 0 3px rgba(255,255,255,.5);
+    width: 150px; height: 140px; border-radius: 14px; background: var(--cream);
+    border: 5px solid var(--ink);
     display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
   }
-  .screen::after { /* LCD scanlines */
+  .screen::after { /* LCD lines */
     content: ""; position: absolute; inset: 0;
-    background: repeating-linear-gradient(to bottom, rgba(17,17,17,.05) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 3px);
   }
   .screen svg { width: 116px; height: 116px; image-rendering: pixelated; }
   .buttons { display: flex; gap: 14px; }
-  .buttons span { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); box-shadow: inset -2px -3px 0 rgba(74,16,51,.35); }
+  .buttons span { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); box-shadow: inset -2px -3px 0 rgba(0,0,0,.25); }
+  /* Sparkle lives only in the celebrating state (twinkles and fairy dust are for celebrations). */
   .glint { animation: glint 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
   .glint.two { animation-delay: 1.2s; }
   .glint.grill { animation-iteration-count: 2; animation-fill-mode: forwards; }   /* the grill glints twice, then rests */
   .pose-a { animation: flick 1s steps(1) infinite; }
   .pose-b { animation: flick 1s steps(1) infinite reverse; }
   @keyframes flick { 0% { opacity: 1; } 50% { opacity: 0; } }
-  @keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(.4); } 80% { opacity: 1; transform: scale(1.15); } 90% { opacity: .8; transform: scale(.9); } }
-  .float { animation: float 2.6s ease-in-out infinite; }
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
-  @media (prefers-reduced-motion: reduce) { .glint, .float, .pose-a, .pose-b { animation: none; } .pose-b { opacity: 0; } .glint { opacity: 1; } }
+  @keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(.4); } 80% { opacity: 1; transform: scale(1.1); } 90% { opacity: .8; transform: scale(.9); } }
+  @media (prefers-reduced-motion: reduce) { .glint, .pose-a, .pose-b { animation: none; } .pose-b { opacity: 0; } .glint { opacity: 1; } }
 
   .stamp {
-    position: absolute; right: -4px; top: 6px; transform: rotate(9deg);
-    font-family: var(--marker); color: var(--red); font-size: 24px; line-height: 1;
-    border: 3px solid var(--red); border-radius: 6px; padding: 6px 8px 4px; background: rgba(255,225,236,.6);
+    position: absolute; right: -4px; top: 6px; transform: rotate(8deg);
+    font-family: var(--marker); color: var(--magenta); font-size: 22px; line-height: 1;
+    border: 2.5px solid var(--magenta); border-radius: 6px; padding: 6px 8px 4px;
+    background: color-mix(in srgb, var(--blush) 75%, transparent);
     text-transform: uppercase; letter-spacing: .02em;
   }
-  .slogan { font-family: var(--marker); color: var(--red); font-size: 22px; text-align: center; margin: 10px 0 2px; transform: rotate(-1.5deg); white-space: nowrap; overflow: hidden; }
+  .slogan { font-family: var(--marker); color: var(--magenta); font-size: 22px; text-align: center; margin: 10px 0 2px; transform: rotate(-1.5deg); white-space: nowrap; overflow: hidden; }
   .sticker {
-    position: absolute; left: -6px; bottom: 18px; transform: rotate(-12deg);
-    font-family: var(--label); font-weight: 700; letter-spacing: .14em; font-size: 13px; color: var(--white);
-    background: var(--plum); border: 3px solid var(--white); border-radius: 999px; padding: 8px 12px;
-    box-shadow: 0 4px 10px -4px rgba(74,16,51,.6);
+    position: absolute; left: -6px; bottom: 18px; transform: rotate(-10deg);
+    font-family: var(--label); font-weight: 800; letter-spacing: .12em; font-size: 12px; color: var(--cream);
+    background: var(--plum); border: 2px solid var(--gold); border-radius: 999px; padding: 8px 12px;
+    box-shadow: 0 6px 12px -6px rgba(0,0,0,.5);
   }
-  h1 { font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 58px; line-height: 1; margin: 12px 0 2px; color: var(--ink); text-align: center; letter-spacing: -.01em; }
+  h1 { font-family: var(--serif); font-weight: 900; font-size: 60px; line-height: 1; margin: 12px 0 4px; color: var(--ink); text-align: center; letter-spacing: -.02em; }
   .line { text-align: center; font-size: 18px; margin: 4px 0 2px; }
-  .why { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--plum); margin: 0 0 16px; }
+  .why { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--wine); margin: 0 0 16px; }
   .why ul { list-style: none; padding: 0; margin: 4px 0 0; }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px dashed var(--plum); border-bottom: 1px dashed var(--plum); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); }
   .stat { padding: 10px 6px; text-align: center; }
-  .stat + .stat { border-left: 1px dashed var(--plum); }
-  .stat .n { font-family: var(--serif); font-style: italic; font-size: 34px; line-height: 1.05; color: var(--hot); }
-  .stat .label { font-size: 10px; color: var(--plum); display: block; margin-top: 2px; }
-  .meter { height: 10px; margin: 12px 6px 6px; border: 2px solid var(--ink); background: var(--white); position: relative; }
-  .meter i { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(90deg, var(--hot) 0 6px, var(--candy) 6px 8px); }
+  .stat + .stat { border-left: 1px solid var(--gold); }
+  .stat .n { font-family: var(--serif); font-weight: 900; font-size: 34px; line-height: 1.05; color: var(--wine); }
+  .stat .label { font-size: 10px; color: var(--wine); display: block; margin-top: 2px; }
+  .meter { height: 10px; margin: 12px 6px 6px; border: 1.5px solid var(--ink); background: var(--cream); border-radius: 999px; overflow: hidden; position: relative; }
+  .meter i { position: absolute; inset: 0 auto 0 0; background: var(--candy); }
 
-  .receipt { font-family: var(--mono); font-size: 14px; margin: 16px 0 8px; }
+  .receipt { font-family: var(--mono); font-size: 13.5px; margin: 16px 0 8px; }
   .receipt .r { display: flex; gap: 8px; line-height: 28px; }
-  .receipt .r .d { width: 34px; color: var(--plum); }
-  .receipt .r .k { width: 76px; text-transform: uppercase; font-weight: 700; }
+  .receipt .r .d { width: 34px; color: var(--wine); }
+  .receipt .r .k { width: 76px; text-transform: uppercase; font-weight: 500; }
   .receipt .r .note { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .receipt .r .t { color: var(--plum); }
-  .receipt .empty { line-height: 28px; color: var(--plum); font-style: italic; }
-  .totals { font-family: var(--mono); font-size: 14px; border-top: 2px solid var(--ink); padding-top: 4px; }
+  .receipt .r .t { color: var(--wine); }
+  .receipt .empty { line-height: 28px; color: var(--wine); font-style: italic; }
+  .totals { font-family: var(--mono); font-size: 13.5px; border-top: 1.5px solid var(--ink); padding-top: 4px; }
   .totals .r { display: flex; justify-content: space-between; line-height: 28px; text-transform: uppercase; }
-  .totals .grand { font-weight: 700; border-top: 1px solid var(--ink); }
+  .totals .grand { font-weight: 500; border-top: 1px solid var(--gold); }
 
   .feed { margin-top: 20px; }
-  .feed h2 { font-family: var(--label); text-transform: uppercase; letter-spacing: .2em; font-size: 13px; margin: 0 0 8px; color: var(--hot); }
+  .feed h2 { font-family: var(--label); font-weight: 800; text-transform: uppercase; letter-spacing: .16em; font-size: 12px; margin: 0 0 8px; color: var(--wine); }
   .feed .row { display: flex; flex-wrap: wrap; gap: 8px; }
   .feed button {
-    font-family: var(--label); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: 12px;
-    color: var(--ink); background: var(--white); border: 2px solid var(--ink); border-radius: 999px;
-    padding: 8px 12px; cursor: pointer; box-shadow: 2px 2px 0 var(--hot);
+    font-family: var(--label); font-weight: 800; font-size: 13px; letter-spacing: -.01em;
+    color: var(--ink); background: var(--candy); border: 0; border-radius: 999px;
+    padding: 9px 16px; cursor: pointer;
   }
-  .feed button:hover, .feed button:focus-visible { background: var(--candy); outline: none; }
-  .feed button:active { transform: translate(2px, 2px); box-shadow: none; }
-  .feed p { font-size: 14px; margin: 10px 0 0; color: var(--plum); }
-  .toast { font-family: var(--mono); font-size: 12px; min-height: 18px; margin-top: 6px; color: var(--red); }
-  .thanks { font-family: var(--marker); color: var(--red); font-size: 30px; text-align: center; margin: 22px 0 0; transform: rotate(-3deg); }
-  .foot { text-align: center; margin-top: 8px; color: var(--plum); font-size: 10px; }
-  @media (max-width: 380px) { h1 { font-size: 46px; } .egg { width: 210px; height: 244px; } .stamp { font-size: 19px; } }
+  .feed button:hover, .feed button:focus-visible { background: var(--ink); color: var(--cream); outline: none; }
+  .feed p { font-size: 14px; margin: 10px 0 0; color: var(--wine); }
+  .toast { font-family: var(--mono); font-size: 12px; min-height: 18px; margin-top: 6px; color: var(--magenta); }
+  .thanks { font-family: var(--marker); color: var(--magenta); font-size: 30px; text-align: center; margin: 22px 0 0; transform: rotate(-3deg); }
+  .foot { text-align: center; margin-top: 8px; color: var(--wine); font-size: 10px; }
+  @media (max-width: 380px) { h1 { font-size: 48px; } .egg { width: 210px; height: 244px; } .stamp { font-size: 18px; } }
 </style>
 </head>
 <body>
@@ -184,25 +182,28 @@ const d = DATA || SAMPLE;
 // ---- style.json: palette, fonts and lines. Values were checked in style.py (hex colours,
 // plain font names); lines only ever go in through textContent.
 const ST = d.style || {};
-const PAL = Object.assign({ hero: "#FF2D8A", accent: "#FFB3D1", paper: "#F6EFE4", paper_pink: "#FFE1EC",
-  ink: "#111111", marker: "#E0202E", plum: "#4A1033", gold: "#D4A64A", cool: "#BFD4EA" }, ST.palette || {});
-const FONTS = Object.assign({ masthead: "Playfair Display", label: "Archivo Narrow", body: "Newsreader",
-  scrawl: "Permanent Marker", mono: "Courier Prime" }, ST.fonts || {});
+const PAL = Object.assign({ hero: "#50163C", accent: "#FE9DCA", paper: "#FFF7F4", paper_pink: "#FFE3F1",
+  ink: "#3B1230", marker: "#C2246E", plum: "#50163C", wine: "#682047", gold: "#E9B949", cool: "#B9B3F5" }, ST.palette || {});
+if (!(ST.palette || {}).wine) PAL.wine = PAL.plum;   // older style files have no wine: use plum
+const FONTS = Object.assign({ masthead: "Fraunces", label: "Bricolage Grotesque", body: "Fraunces",
+  scrawl: "Permanent Marker", mono: "DM Mono" }, ST.fonts || {});
 const LINES = Object.assign({ todo: "", celebrate: "", affirm: "" }, ST.lines || {});
 (function applyStyle() {
   const root = document.documentElement.style;
-  const map = { hot: "hero", candy: "accent", cream: "paper", paper: "paper_pink", ink: "ink",
-    red: "marker", plum: "plum", gold: "gold", blue: "cool" };
+  const map = { ground: "hero", candy: "accent", cream: "paper", blush: "paper_pink", ink: "ink",
+    magenta: "marker", plum: "plum", wine: "wine", gold: "gold" };   // hero is the ground, not an accent
   Object.entries(map).forEach(([v, k]) => root.setProperty("--" + v, PAL[k]));
-  const stacks = { serif: ["masthead", "Didot, Georgia, serif"], label: ["label", "'Arial Narrow', sans-serif"],
-    body: ["body", "Georgia, serif"], mono: ["mono", "'Courier New', monospace"], marker: ["scrawl", "'Marker Felt', cursive"] };
+  const stacks = { serif: ["masthead", "Georgia, serif"], label: ["label", "system-ui, sans-serif"],
+    body: ["body", "Georgia, serif"], mono: ["mono", "ui-monospace, Menlo, monospace"], marker: ["scrawl", "'Marker Felt', cursive"] };
   Object.entries(stacks).forEach(([v, [k, fb]]) => root.setProperty("--" + v, `"${FONTS[k]}", ${fb}`));
-  const axes = { masthead: ":ital,wght@0,700;1,700", label: ":wght@500;700", body: ":ital@0;1", mono: ":wght@400;700", scrawl: "" };
+  const axes = { masthead: ":wght@900", label: ":wght@400;800", body: ":ital,wght@0,400;1,400", mono: ":wght@400;500", scrawl: "" };
   Object.entries(axes).forEach(([k, ax]) => {   // one link per font, so one unknown font cannot break the rest
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(FONTS[k]).replace(/%20/g, "+") + ax + "&display=swap";
-    document.head.appendChild(link);
+    [ax, ""].forEach(a => {                     // plus a plain request, in case the font lacks those weights
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(FONTS[k]).replace(/%20/g, "+") + a + "&display=swap";
+      document.head.appendChild(link);
+    });
   });
 })();
 
@@ -290,19 +291,19 @@ function drawLeopard(state, pose) {
   ink.forEach(([x, y]) => set(x, y, "K"));
   return g;
 }
-const PIX = () => ({ K: PAL.ink, A: PAL.accent, H: PAL.hero, P: PAL.paper_pink, S: PAL.plum,
-  W: "#FFFFFF", G: PAL.gold, R: PAL.marker, D: PAL.cool });
+const PIX = () => ({ K: PAL.ink, A: PAL.accent, H: PAL.wine, P: PAL.paper_pink, S: PAL.wine,
+  W: "#FFFFFF", G: PAL.gold, R: PAL.marker });
 function drawPet(state) {
   const colours = PIX();
   const svgPx = g => g.map((row, y) => row.map((c, x) => c ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${colours[c]}"/>` : "").join("")).join("");
   let out = state === "restless"   // tail flick: two poses, swapped by CSS
-    ? `<g class="float"><g class="pose-a">${svgPx(drawLeopard(state, "rest"))}</g><g class="pose-b">${svgPx(drawLeopard(state, "flick"))}</g></g>`
-    : `<g class="float">${svgPx(drawLeopard(state))}</g>`;
+    ? `<g class="pet"><g class="pose-a">${svgPx(drawLeopard(state, "rest"))}</g><g class="pose-b">${svgPx(drawLeopard(state, "flick"))}</g></g>`
+    : `<g class="pet">${svgPx(drawLeopard(state))}</g>`;
   const star = (x, y, s, cls) => `<path class="glint ${cls}" fill="#FFFFFF" stroke="${PAL.gold}" stroke-width=".2" d="M${x} ${y - s}L${x + s * .3} ${y - s * .3}L${x + s} ${y}L${x + s * .3} ${y + s * .3}L${x} ${y + s}L${x - s * .3} ${y + s * .3}L${x - s} ${y}L${x - s * .3} ${y - s * .3}Z"/>`;
-  out += star(13.5, 17.5, 1.6, "grill") + star(17.5, 17.5, 1.2, "grill two");
-  const text = (x, y, t, size, color) => `<text x="${x}" y="${y}" font-family="Courier Prime, monospace" font-weight="700" font-size="${size}" fill="${color}">${t}</text>`;
+  if (state === "celebrating") out += star(13.5, 17.5, 1.6, "grill") + star(17.5, 17.5, 1.2, "grill two");
+  const text = (x, y, t, size, color) => `<text x="${x}" y="${y}" font-family="${FONTS.mono}, monospace" font-weight="500" font-size="${size}" fill="${color}">${t}</text>`;
   if (state === "asleep" || state === "sleepy") out += text(25, 4, "z", 3.4, PAL.plum) + text(28, 1, "Z", 4.2, PAL.plum);
-  if (state === "worried") out += `<path d="M28 4 Q26.4 7 28 8 Q29.6 7 28 4Z" fill="${PAL.cool}" stroke="${PAL.ink}" stroke-width=".4"/>`;
+  if (state === "worried") out += `<path d="M28 4 Q26.4 7 28 8 Q29.6 7 28 4Z" fill="${PAL.paper}" stroke="${PAL.ink}" stroke-width=".4"/>`;
   if (state === "celebrating") out += star(2, 6, 1.8, "") + star(30, 5, 2, "two") + star(29, 18, 1.4, "") + star(3, 20, 1.3, "two") + star(16, 1, 1.2, "");
   document.getElementById("pet").innerHTML = out;
 }
