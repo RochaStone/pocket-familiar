@@ -37,7 +37,7 @@ Her lines only show when you have no style.json at all and her example is the st
 | `fonts.scrawl` | a handwriting or marker font | stamp, top line, THANK YOU |
 | `fonts.mono` | a typewriter font | receipt lines |
 | `fonts.script` | a signature script | not used by the familiar |
-| `motif` | one of guest-check, front-page, magazine-scrawl, pink-paper, sticker-collage, rotary, leopard, retro-tv, neutral | no (she is always a guest check) |
+| `motif` | `analog`, `cyberpunk` or `y2k-blog` (older names like guest-check still work) | the shape of her web card: guest check, handheld, or blog window |
 | `lines.todo` | your to-do line | top of the card and the receipt |
 | `lines.celebrate` | what you say when it goes right | the sticker when she celebrates |
 | `lines.affirm` | the line you live by | printed when you hit a streak |

@@ -23,6 +23,18 @@ BUNDLED = os.path.join(HERE, "examples", "style.rocha-coded.json")
 HEX = re.compile(r"#(?:[0-9a-fA-F]{3}){1,2}")
 FONT = re.compile(r"[A-Za-z0-9 ]{1,48}")
 TEXT_KEYS = ("name", "owner", "handle", "site", "motif", "notes")
+MOTIFS = ("analog", "cyberpunk", "y2k-blog")
+# Older motif names map to the nearest of the three families.
+MOTIF_ALIASES = {"guest-check": "analog", "front-page": "analog", "magazine-scrawl": "analog",
+                 "pink-paper": "analog", "rotary": "analog", "neutral": "analog",
+                 "retro-tv": "cyberpunk", "leopard": "cyberpunk", "sticker-collage": "y2k-blog",
+                 "y2k": "y2k-blog", "blog": "y2k-blog"}
+
+
+def motif(value) -> str:
+    """One of analog, cyberpunk, y2k-blog. Anything unknown is analog."""
+    v = str(value or "").strip().lower()
+    return v if v in MOTIFS else MOTIF_ALIASES.get(v, "analog")
 
 
 def candidates(override: str | None = None, cwd: str | None = None) -> list:

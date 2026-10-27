@@ -311,22 +311,32 @@ def web_data(state, config, t):
         "week": week_start(t).strftime("%d %b %Y"), "table": f"{t.isocalendar()[1]:02d}",
         "generated": t.strftime("%a %d %b, %H:%M"),
         "style": {k: STYLE.get(k) for k in ("name", "owner", "handle", "palette", "fonts", "lines")},
+        "motif": house.motif(STYLE.get("motif")),
+        "total": len(state.get("feeds", [])),
     }
 
 
 def cmd_web(args):
     state = need_state()
     config, t = load_config(), now()
-    with open(os.path.join(HERE, "templates", "familiar.html"), encoding="utf-8") as fh:
-        template = fh.read()
-    payload = json.dumps(web_data(state, config, t), ensure_ascii=False)
+    parts = {}
+    for name in ("familiar.html", "motifs.css", "familiar.js"):
+        with open(os.path.join(HERE, "templates", name), encoding="utf-8") as fh:
+            parts[name] = fh.read()
+    data = web_data(state, config, t)
+    if args.motif:
+        data["motif"] = house.motif(args.motif)
+    payload = json.dumps(data, ensure_ascii=False)
     payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
-    html = template.replace("/*__FAMILIAR_DATA__*/null", payload)
+    html = (parts["familiar.html"]
+            .replace("/*__MOTIFS_CSS__*/", parts["motifs.css"], 1)
+            .replace("/*__FAMILIAR_JS__*/", parts["familiar.js"], 1)
+            .replace("/*__FAMILIAR_DATA__*/null", payload, 1))   # data last, so a note can never inject code
     out = os.path.expanduser(args.out) if args.out else os.path.join(home(), "familiar.html")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     with open(out, "w", encoding="utf-8") as fh:
         fh.write(html)
-    print(f"Card written: {out}")
+    print(f"Card written ({data['motif']}): {out}")
     if not args.no_open and not webbrowser.open("file://" + os.path.abspath(out)):
         print("Open that file in any browser to see her.")
     return 0
@@ -463,6 +473,7 @@ def main(argv=None):
     w = sub.add_parser("web", help="write and open the web card")
     w.add_argument("--out")
     w.add_argument("--no-open", action="store_true")
+    w.add_argument("--motif", choices=house.MOTIFS, help="analog, cyberpunk or y2k-blog (default: your style.json)")
     c = sub.add_parser("config", help="optional settings")
     c.add_argument("--ledger", help="probe ledger path; auto finds goal tests (default); off ignores it")
     c.add_argument("--open-items", dest="open_items", help="open items markdown; off to clear")

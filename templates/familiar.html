@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
+
   :root {
     /* The current Rocheverse (v2). Overwritten at load from style.json. hero is the GROUND. */
     --ground: #50163C; --blush: #FFE3F1; --cream: #FFF7F4; --ink: #3B1230; --candy: #FE9DCA;
@@ -16,59 +17,19 @@
     --body: "Fraunces", Georgia, serif;
     --mono: "DM Mono", ui-monospace, Menlo, monospace;
     --marker: "Permanent Marker", "Marker Felt", cursive;
+    --pixel: "Silkscreen", "Pixelify Sans", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background-color: var(--ground);
+    background-color: var(--ground);  /* analog and y2k-blog override the page below */
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     color: var(--ink); font-family: var(--body);
     min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
     padding: 40px 16px 56px;
   }
-  .check {
-    width: 100%; max-width: 420px; position: relative; transform: rotate(-0.8deg);
-    background-color: var(--blush);
-    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in srgb, var(--magenta) 20%, transparent) 27px 28px);
-    box-shadow: 0 22px 40px -14px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.25);   /* a print on a desk */
-    padding: 22px 24px 40px;
-    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
-            mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
-  }
-  .check::before { /* margin rule like a real pad */
-    content: ""; position: absolute; top: 0; bottom: 0; left: 16px; width: 1px; background: color-mix(in srgb, var(--magenta) 40%, transparent);
-  }
-  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--gold); padding-bottom: 6px; }
-  .label { font-family: var(--label); text-transform: uppercase; letter-spacing: .12em; font-weight: 800; font-size: 11px; }
-  .head .title { color: var(--wine); font-size: 14px; letter-spacing: .22em; }
-  .sub { display: flex; justify-content: space-between; margin-top: 6px; color: var(--wine); font-size: 10px; }
-
-  .stage { display: grid; grid-template-columns: 1fr; justify-items: center; margin: 22px 0 6px; position: relative; }
-  .egg {
-    width: 236px; height: 270px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
-    background-color: var(--plum);
-    background-image:
-      radial-gradient(circle at 18% 22%, var(--wine) 0 6px, transparent 7px),
-      radial-gradient(circle at 80% 18%, var(--wine) 0 5px, transparent 6px),
-      radial-gradient(circle at 12% 62%, var(--wine) 0 5px, transparent 6px),
-      radial-gradient(circle at 88% 58%, var(--wine) 0 7px, transparent 8px),
-      radial-gradient(circle at 30% 90%, var(--wine) 0 5px, transparent 6px),
-      radial-gradient(circle at 72% 88%, var(--wine) 0 6px, transparent 7px);
-    box-shadow: inset -10px -14px 0 rgba(0,0,0,.22), inset 8px 10px 0 rgba(255,255,255,.06), 0 12px 20px -8px rgba(0,0,0,.45);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-  }
-  .screen {
-    width: 150px; height: 140px; border-radius: 14px; background: var(--cream);
-    border: 5px solid var(--ink);
-    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
-  }
-  .screen::after { /* LCD lines */
-    content: ""; position: absolute; inset: 0;
-    background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 3px);
-  }
-  .screen svg { width: 116px; height: 116px; image-rendering: pixelated; }
-  .buttons { display: flex; gap: 14px; }
-  .buttons span { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); box-shadow: inset -2px -3px 0 rgba(0,0,0,.25); }
+  .px { font-family: var(--pixel); text-transform: lowercase; letter-spacing: .02em; }
+  .pet-svg { display: block; image-rendering: pixelated; }
   /* Sparkle lives only in the celebrating state (twinkles and fairy dust are for celebrations). */
   .glint { animation: glint 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
   .glint.two { animation-delay: 1.2s; }
@@ -79,310 +40,15 @@
   @keyframes glint { 0%, 70%, 100% { opacity: 0; transform: scale(.4); } 80% { opacity: 1; transform: scale(1.1); } 90% { opacity: .8; transform: scale(.9); } }
   @media (prefers-reduced-motion: reduce) { .glint, .pose-a, .pose-b { animation: none; } .pose-b { opacity: 0; } .glint { opacity: 1; } }
 
-  .stamp {
-    position: absolute; right: -4px; top: 6px; transform: rotate(8deg);
-    font-family: var(--marker); color: var(--magenta); font-size: 22px; line-height: 1;
-    border: 2.5px solid var(--magenta); border-radius: 6px; padding: 6px 8px 4px;
-    background: color-mix(in srgb, var(--blush) 75%, transparent);
-    text-transform: uppercase; letter-spacing: .02em;
-  }
-  .slogan { font-family: var(--marker); color: var(--magenta); font-size: 22px; text-align: center; margin: 10px 0 2px; transform: rotate(-1.5deg); white-space: nowrap; overflow: hidden; }
-  .sticker {
-    position: absolute; left: -6px; bottom: 18px; transform: rotate(-10deg);
-    font-family: var(--label); font-weight: 800; letter-spacing: .12em; font-size: 12px; color: var(--cream);
-    background: var(--plum); border: 2px solid var(--gold); border-radius: 999px; padding: 8px 12px;
-    box-shadow: 0 6px 12px -6px rgba(0,0,0,.5);
-  }
-  h1 { font-family: var(--serif); font-weight: 900; font-size: 60px; line-height: 1; margin: 12px 0 4px; color: var(--ink); text-align: center; letter-spacing: -.02em; }
-  .line { text-align: center; font-size: 18px; margin: 4px 0 2px; }
-  .why { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--wine); margin: 0 0 16px; }
-  .why ul { list-style: none; padding: 0; margin: 4px 0 0; }
-
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); }
-  .stat { padding: 10px 6px; text-align: center; }
-  .stat + .stat { border-left: 1px solid var(--gold); }
-  .stat .n { font-family: var(--serif); font-weight: 900; font-size: 34px; line-height: 1.05; color: var(--wine); }
-  .stat .label { font-size: 10px; color: var(--wine); display: block; margin-top: 2px; }
-  .meter { height: 10px; margin: 12px 6px 6px; border: 1.5px solid var(--ink); background: var(--cream); border-radius: 999px; overflow: hidden; position: relative; }
-  .meter i { position: absolute; inset: 0 auto 0 0; background: var(--candy); }
-
-  .receipt { font-family: var(--mono); font-size: 13.5px; margin: 16px 0 8px; }
-  .receipt .r { display: flex; gap: 8px; line-height: 28px; }
-  .receipt .r .d { width: 34px; color: var(--wine); }
-  .receipt .r .k { width: 76px; text-transform: uppercase; font-weight: 500; }
-  .receipt .r .note { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .receipt .r .t { color: var(--wine); }
-  .receipt .empty { line-height: 28px; color: var(--wine); font-style: italic; }
-  .totals { font-family: var(--mono); font-size: 13.5px; border-top: 1.5px solid var(--ink); padding-top: 4px; }
-  .totals .r { display: flex; justify-content: space-between; line-height: 28px; text-transform: uppercase; }
-  .totals .grand { font-weight: 500; border-top: 1px solid var(--gold); }
-
-  .feed { margin-top: 20px; }
-  .feed h2 { font-family: var(--label); font-weight: 800; text-transform: uppercase; letter-spacing: .16em; font-size: 12px; margin: 0 0 8px; color: var(--wine); }
-  .feed .row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .feed button {
-    font-family: var(--label); font-weight: 800; font-size: 13px; letter-spacing: -.01em;
-    color: var(--ink); background: var(--candy); border: 0; border-radius: 999px;
-    padding: 9px 16px; cursor: pointer;
-  }
-  .feed button:hover, .feed button:focus-visible { background: var(--ink); color: var(--cream); outline: none; }
-  .feed p { font-size: 14px; margin: 10px 0 0; color: var(--wine); }
-  .toast { font-family: var(--mono); font-size: 12px; min-height: 18px; margin-top: 6px; color: var(--magenta); }
-  .thanks { font-family: var(--marker); color: var(--magenta); font-size: 30px; text-align: center; margin: 22px 0 0; transform: rotate(-3deg); }
-  .foot { text-align: center; margin-top: 8px; color: var(--wine); font-size: 10px; }
-  @media (max-width: 380px) { h1 { font-size: 48px; } .egg { width: 210px; height: 244px; } .stamp { font-size: 18px; } }
+</style>
+<style>
+/*__MOTIFS_CSS__*/
 </style>
 </head>
 <body>
-<main class="check" aria-label="Your familiar">
-  <div class="head"><span class="label title">Guest Check</span><span class="label" id="table"></span></div>
-  <div class="slogan" id="slogan"></div>
-  <div class="sub"><span class="label" id="server"></span><span class="label" id="week"></span></div>
-
-  <div class="stage">
-    <div class="egg">
-      <div class="screen"><svg id="pet" viewBox="-1 -2 34 34" role="img" aria-label="Pixel leopard"></svg></div>
-      <div class="buttons" aria-hidden="true"><span></span><span></span><span></span></div>
-    </div>
-    <div class="stamp" id="stamp"></div>
-    <div class="sticker" id="sticker" hidden></div>
-  </div>
-
-  <h1 id="name"></h1>
-  <p class="line" id="line"></p>
-  <div class="why" id="why"></div>
-
-  <div class="stats">
-    <div class="stat"><div class="n" id="streak"></div><span class="label">Day streak</span></div>
-    <div class="stat"><div class="meter" aria-hidden="true"><i id="hungerbar"></i></div><span class="label" id="hunger"></span></div>
-    <div class="stat"><div class="n" id="watchn"></div><span class="label" id="watchl"></span></div>
-  </div>
-
-  <div class="receipt" id="receipt"></div>
-  <div class="totals" id="totals"></div>
-
-  <section class="feed">
-    <h2>Feed her</h2>
-    <div class="row" id="feedrow"></div>
-    <p>Feeding happens in your terminal. Tap a dish to copy the command, then paste it there and add a note.</p>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </section>
-
-  <div class="thanks">THANK YOU!</div>
-  <div class="foot label" id="foot"></div>
-</main>
-
 <script>
 const DATA = /*__FAMILIAR_DATA__*/null;
-const SAMPLE = { name: "Lucky", state: "fed", reason: "just ate", details: [], line: "Lucky is fed and purring.",
-  streak: 1, hunger: 0, feeds: [], totals: {}, watch: { label: "Shipped this month", value: 0 },
-  week: "", table: "01", generated: "" };
-const d = DATA || SAMPLE;
-
-// ---- style.json: palette, fonts and lines. Values were checked in style.py (hex colours,
-// plain font names); lines only ever go in through textContent.
-const ST = d.style || {};
-const PAL = Object.assign({ hero: "#50163C", accent: "#FE9DCA", paper: "#FFF7F4", paper_pink: "#FFE3F1",
-  ink: "#3B1230", marker: "#C2246E", plum: "#50163C", wine: "#682047", gold: "#E9B949", cool: "#B9B3F5" }, ST.palette || {});
-if (!(ST.palette || {}).wine) PAL.wine = PAL.plum;   // older style files have no wine: use plum
-const FONTS = Object.assign({ masthead: "Fraunces", label: "Bricolage Grotesque", body: "Fraunces",
-  scrawl: "Permanent Marker", mono: "DM Mono" }, ST.fonts || {});
-const LINES = Object.assign({ todo: "", celebrate: "", affirm: "" }, ST.lines || {});
-(function applyStyle() {
-  const root = document.documentElement.style;
-  const map = { ground: "hero", candy: "accent", cream: "paper", blush: "paper_pink", ink: "ink",
-    magenta: "marker", plum: "plum", wine: "wine", gold: "gold" };   // hero is the ground, not an accent
-  Object.entries(map).forEach(([v, k]) => root.setProperty("--" + v, PAL[k]));
-  const stacks = { serif: ["masthead", "Georgia, serif"], label: ["label", "system-ui, sans-serif"],
-    body: ["body", "Georgia, serif"], mono: ["mono", "ui-monospace, Menlo, monospace"], marker: ["scrawl", "'Marker Felt', cursive"] };
-  Object.entries(stacks).forEach(([v, [k, fb]]) => root.setProperty("--" + v, `"${FONTS[k]}", ${fb}`));
-  const axes = { masthead: ":wght@900", label: ":wght@400;800", body: ":ital,wght@0,400;1,400", mono: ":wght@400;500", scrawl: "" };
-  Object.entries(axes).forEach(([k, ax]) => {   // one link per font, so one unknown font cannot break the rest
-    [ax, ""].forEach(a => {                     // plus a plain request, in case the font lacks those weights
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(FONTS[k]).replace(/%20/g, "+") + a + "&display=swap";
-      document.head.appendChild(link);
-    });
-  });
-})();
-
-// ---- the leopard, drawn from shapes on a 32 x 32 grid, then outlined in ink on every edge.
-// Fur = accent, rosettes = hero, muzzle and belly = paper_pink, grill = gold with white diamonds.
-const N = 32;
-function drawLeopard(state, pose) {
-  const g = Array.from({ length: N }, () => Array(N).fill(null));
-  const part = Array.from({ length: N }, () => Array(N).fill(""));
-  const inside = (x, y) => x >= 0 && y >= 0 && x < N && y < N;
-  const set = (x, y, c, p) => { if (inside(x, y)) { g[y][x] = c; if (p) part[y][x] = p; } };
-  const ellipse = (cx, cy, rx, ry, c, p) => {
-    for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
-      for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++)
-        if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) set(x, y, c, p);
-  };
-  const limb = (pts, r, c, p) => {       // a thick line through points, for arms and tail
-    for (let i = 0; i < pts.length - 1; i++) {
-      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
-      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) * 2 || 1;
-      for (let s = 0; s <= steps; s++) ellipse(x0 + (x1 - x0) * s / steps, y0 + (y1 - y0) * s / steps, r, r, c, p);
-    }
-  };
-  const F = "fur";
-  const up = state === "celebrating";
-  // tail behind the body (restless gets a second pose, swapped by CSS)
-  const tails = { rest: [[23, 28], [27, 27], [29, 24], [28, 21]], flick: [[23, 28], [27, 28], [30, 27], [31, 24]] };
-  limb(tails[pose || "rest"], 1.1, "A", "tail");
-  // body, sitting
-  ellipse(16, 24.5, 7.6, 6.2, "A", "body");
-  ellipse(16, 25.5, 3.6, 4, "P", "body");             // belly
-  // arms: down by the paws, or up in the air
-  if (up) {
-    limb([[9, 22], [4, 18], [2.5, 12]], 1.1, "A", "arm");
-    limb([[23, 22], [28, 18], [29.5, 12]], 1.1, "A", "arm");
-    ellipse(2.5, 11, 1.6, 1.6, "A", "arm"); ellipse(29.5, 11, 1.6, 1.6, "A", "arm");
-  } else {
-    ellipse(12.5, 29.6, 2.2, 1.4, "A", "arm"); ellipse(19.5, 29.6, 2.2, 1.4, "A", "arm");   // front paws
-  }
-  // ears: small and round, with a darker inner ear
-  ellipse(8.5, 5.5, 2.6, 2.6, "A", "ear"); ellipse(23.5, 5.5, 2.6, 2.6, "A", "ear");
-  set(8, 5, "H"); set(9, 5, "H"); set(8, 6, "H"); set(23, 5, "H"); set(24, 5, "H"); set(24, 6, "H");
-  // head
-  ellipse(16, 12, 9.6, 7.6, "A", "head");
-  ellipse(16, 16, 4.6, 2.8, "P", "head");             // muzzle
-  // rosettes: irregular rings of hero pink, some broken
-  // rosettes: broken rings of hero pink around a fur centre, each ring missing a different side
-  const RING = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]];
-  const ros = [[9, 8, 0], [16, 5, 2], [23, 8, 5], [7, 14, 3], [25, 14, 6], [11, 21, 1], [21, 21, 4], [10, 26, 7], [22, 26, 2], [16, 30, 5]];
-  ros.forEach(([x, y, gap]) => RING.forEach(([dx, dy], i) => {
-    if (i === gap || i === (gap + 1) % 8) return;
-    if (inside(x + dx, y + dy) && g[y + dy][x + dx] === "A") set(x + dx, y + dy, "H");
-  }));
-  // nose
-  set(15, 14, "S"); set(16, 14, "S"); set(15, 15, "K"); set(16, 15, "K");
-  // mouth and grill: four white diamonds on a gold bar, lips in ink
-  const open = state === "hungry";
-  for (let x = 12; x <= 19; x++) { set(x, 16, "K"); set(x, 18, "K"); }
-  ["K", "W", "G", "W", "G", "W", "G", "W"].forEach((c, i) => set(12 + i, 17, c));
-  set(19, 17, "K");
-  if (open) { for (let x = 13; x <= 18; x++) { set(x, 18, "R"); set(x, 19, "K"); } set(12, 18, "K"); set(19, 18, "K"); }
-  // eyes, per mood
-  const E = {
-    fed:         [[0, 0, "K"], [1, 1, "K"], [2, 0, "K"]],                                  // content: closed, smiling
-    celebrating: [[0, 0, "K"], [1, 0, "K"], [0, 1, "K"], [1, 1, "K"], [0, 0, "W"]],
-    hungry:      [[0, 0, "K"], [1, 0, "K"], [0, 1, "K"], [1, 1, "K"], [1, 0, "W"]],
-    sleepy:      [[0, 1, "K"], [1, 1, "K"], [2, 1, "K"]],
-    asleep:      [[0, 1, "K"], [1, 1, "K"], [2, 1, "K"]],
-    worried:     [[0, 0, "W"], [1, 0, "W"], [2, 0, "W"], [0, 1, "W"], [1, 1, "K"], [2, 1, "W"], [0, 2, "W"], [1, 2, "W"], [2, 2, "W"]],
-    restless:    [[0, 0, "W"], [1, 0, "K"], [2, 0, "K"], [0, 1, "W"], [1, 1, "K"], [2, 1, "K"]]   // looking sideways
-  }[state] || [];
-  [[10, 10], [20, 10]].forEach(([ex, ey]) => E.forEach(([dx, dy, c]) => set(ex + dx, ey + dy, c)));
-  if (state === "worried") [[10, 10], [20, 10]].forEach(([ex, ey]) => {   // ink ring around wide eyes
-    for (let dx = -1; dx <= 3; dx++) for (let dy = -1; dy <= 3; dy++)
-      if ((dx < 0 || dx > 2 || dy < 0 || dy > 2) && g[ey + dy][ex + dx] === "A") set(ex + dx, ey + dy, "K");
-  });
-  // ink outline on every outer edge, and a neck line where the head meets the body
-  const filled = (x, y) => inside(x, y) && g[y][x] !== null;
-  const ink = [];
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    if (g[y][x] === null && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => filled(x + dx, y + dy))) ink.push([x, y]);
-    if (part[y][x] === "body" && g[y][x] === "A" && inside(x, y - 1) && part[y - 1][x] === "head") ink.push([x, y]);
-    if (part[y][x] === "arm" && g[y][x] === "A" && [[1, 0], [-1, 0], [0, -1], [0, 1]].some(([dx, dy]) => inside(x + dx, y + dy) && ["body", "head", "tail"].includes(part[y + dy][x + dx]))) ink.push([x, y]);
-  }
-  ink.forEach(([x, y]) => set(x, y, "K"));
-  return g;
-}
-const PIX = () => ({ K: PAL.ink, A: PAL.accent, H: PAL.wine, P: PAL.paper_pink, S: PAL.wine,
-  W: "#FFFFFF", G: PAL.gold, R: PAL.marker });
-function drawPet(state) {
-  const colours = PIX();
-  const svgPx = g => g.map((row, y) => row.map((c, x) => c ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${colours[c]}"/>` : "").join("")).join("");
-  let out = state === "restless"   // tail flick: two poses, swapped by CSS
-    ? `<g class="pet"><g class="pose-a">${svgPx(drawLeopard(state, "rest"))}</g><g class="pose-b">${svgPx(drawLeopard(state, "flick"))}</g></g>`
-    : `<g class="pet">${svgPx(drawLeopard(state))}</g>`;
-  const star = (x, y, s, cls) => `<path class="glint ${cls}" fill="#FFFFFF" stroke="${PAL.gold}" stroke-width=".2" d="M${x} ${y - s}L${x + s * .3} ${y - s * .3}L${x + s} ${y}L${x + s * .3} ${y + s * .3}L${x} ${y + s}L${x - s * .3} ${y + s * .3}L${x - s} ${y}L${x - s * .3} ${y - s * .3}Z"/>`;
-  if (state === "celebrating") out += star(13.5, 17.5, 1.6, "grill") + star(17.5, 17.5, 1.2, "grill two");
-  const text = (x, y, t, size, color) => `<text x="${x}" y="${y}" font-family="${FONTS.mono}, monospace" font-weight="500" font-size="${size}" fill="${color}">${t}</text>`;
-  if (state === "asleep" || state === "sleepy") out += text(25, 4, "z", 3.4, PAL.plum) + text(28, 1, "Z", 4.2, PAL.plum);
-  if (state === "worried") out += `<path d="M28 4 Q26.4 7 28 8 Q29.6 7 28 4Z" fill="${PAL.paper}" stroke="${PAL.ink}" stroke-width=".4"/>`;
-  if (state === "celebrating") out += star(2, 6, 1.8, "") + star(30, 5, 2, "two") + star(29, 18, 1.4, "") + star(3, 20, 1.3, "two") + star(16, 1, 1.2, "");
-  document.getElementById("pet").innerHTML = out;
-}
-
-// ---- fill the card (textContent only: notes are yours, never parsed as HTML)
-const $ = id => document.getElementById(id);
-function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
-drawPet(d.state);
-$("table").textContent = "Table " + d.table;
-$("server").textContent = "Server " + d.name;
-$("week").textContent = d.week ? "Week of " + d.week : "";
-$("stamp").textContent = d.state;
-$("slogan").textContent = LINES.todo;
-$("slogan").hidden = !LINES.todo;
-function fitSlogan() {   // shrink the marker line until it sits on one line
-  const el = $("slogan");
-  let size = 22;
-  el.style.fontSize = size + "px";
-  while (el.scrollWidth > el.clientWidth && size > 11) { size -= 0.5; el.style.fontSize = size + "px"; }
-}
-fitSlogan();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSlogan, err => say("Fonts did not load (" + err.message + ")."));
-$("sticker").textContent = LINES.celebrate;
-$("sticker").hidden = d.state !== "celebrating" || !LINES.celebrate;
-$("name").textContent = d.name;
-$("line").textContent = d.line;
-$("why").textContent = d.reason;
-if (d.details && d.details.length) {
-  const ul = el("ul");
-  d.details.forEach(x => ul.appendChild(el("li", "", "· " + x)));
-  $("why").appendChild(ul);
-}
-$("streak").textContent = d.streak;
-const fed = 100 - Math.max(0, Math.min(100, d.hunger));   // full bar = fed
-$("hungerbar").style.width = fed + "%";
-$("hunger").textContent = "Fed " + fed + "%";
-$("watchn").textContent = d.watch.value;
-$("watchl").textContent = d.watch.label;
-
-const receipt = $("receipt");
-if (!d.feeds.length) receipt.appendChild(el("div", "empty", "Nothing ordered yet this week."));
-d.feeds.forEach(f => {
-  const r = el("div", "r");
-  r.append(el("span", "d", f.day), el("span", "k", f.kind), el("span", "note", f.note || ""), el("span", "t", f.time));
-  receipt.appendChild(r);
-});
-const totals = $("totals");
-Object.entries(d.totals).forEach(([k, v]) => {
-  if (!v) return;
-  const r = el("div", "r"); r.append(el("span", "", k), el("span", "", "x" + v)); totals.appendChild(r);
-});
-[["Tax", "0 tokens"], ["Total", d.feeds.length + " feeds"]].forEach(([a, b], i) => {
-  const r = el("div", i ? "r grand" : "r"); r.append(el("span", "", a), el("span", "", b)); totals.appendChild(r);
-});
-
-// ---- feed her: copy the CLI command
-const KINDS = ["shipped", "sent", "invoiced", "rested", "closed"];
-function say(msg) { $("toast").textContent = msg; }
-function fallbackCopy(text) {
-  const ta = el("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
-  document.body.appendChild(ta); ta.select();
-  let ok = false;
-  try { ok = document.execCommand("copy"); } catch (err) { say("Copy did not work here (" + err.message + "). Type: " + text); }
-  document.body.removeChild(ta);
-  return ok;
-}
-KINDS.forEach(k => {
-  const b = el("button", "", k);
-  b.type = "button";
-  b.addEventListener("click", () => {
-    const cmd = `familiar feed ${k} ""`;
-    const done = () => say("Copied: " + cmd + "  Paste it in your terminal.");
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(cmd).then(done, err => { if (fallbackCopy(cmd)) done(); else say("Copy blocked (" + err.message + "). Type: " + cmd); });
-    } else if (fallbackCopy(cmd)) { done(); } else { say("Type this in your terminal: " + cmd); }
-  });
-  $("feedrow").appendChild(b);
-});
-$("foot").textContent = ["pocket-familiar", [ST.owner, ST.handle].filter(Boolean).join(" "), d.generated ? "printed " + d.generated : ""].filter(Boolean).join(" · ");
+/*__FAMILIAR_JS__*/
 </script>
 </body>
 </html>
