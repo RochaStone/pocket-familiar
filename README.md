@@ -153,6 +153,8 @@ Two come in the box: `examples/style.rocha-coded.json` (Rocha's current look: pl
 Put yours in your working folder or in `~/.rocha-coded/style.json`, or ask Claude to make one with you from a few references.
 Your colours and fonts re-tone every look, and `motif` picks the shape: `analog`, `cyberpunk` or `y2k-blog`. Both are yours to curate.
 
+Pairs with [merwitch-mode](https://github.com/RochaStone/merwitch-mode): install pocket-familiar first, then merwitch-mode, so the two status lines do not fight.
+
 ## See her
 
 - `familiar status` tells you how she is and why.
