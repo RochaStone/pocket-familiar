@@ -7,6 +7,8 @@ None of them is a photo, and none shows a real person.
 |---|---|
 | `docs/img/hero.png` | the sample week rendered in the y2k-blog motif (README hero) |
 | `docs/img/triptych.png` | the same week in analog, cyberpunk and y2k-blog, side by side |
+| `docs/img/lucky-moods.png` | both Luckys in all seven moods: painted on top, pixel underneath |
+| `docs/img/lucky/painted-<mood>.svg` | the painted Lucky, one 400 x 400 SVG per mood (fed, celebrating, sleepy, asleep, hungry, worried, restless) |
 | `docs/img/step-01.svg` to `step-05.svg` | pixel step badges for "Start here" |
 | `docs/img/divider.svg` | a gold pixel hairline between README sections |
 | `docs/img/heart.svg` | a gold pixel heart for "If it goes wrong" |

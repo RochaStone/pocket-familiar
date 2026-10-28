@@ -74,7 +74,25 @@ class Motifs(unittest.TestCase):
                 self.assertIn('data-rendered="ok"', dom)
                 self.assertIn(marker, dom)
                 self.assertIn('data-overflow="no"', dom)   # no sideways scroll at 390px
-                self.assertIn("pet-svg", dom)
+                if m == "cyberpunk":
+                    self.assertIn("Pixel leopard", dom)       # cyberpunk keeps the pixel Lucky
+                else:
+                    self.assertIn("Painted Lucky", dom)       # analog and y2k-blog use the painted Lucky
+
+
+    @unittest.skipUnless(chrome(), "headless Chrome not installed")
+    def test_every_mood_draws_in_pixel(self):
+        path, html = self.web("--motif", "cyberpunk")
+        moods = ["fed", "celebrating", "sleepy", "asleep", "hungry", "worried", "restless"]
+        harness = path.replace(".html", "-moods.html")
+        with open(harness, "w") as fh:   # draw all seven pixel moods on one page, then read it back
+            fh.write(html.replace("</body>", "<script>document.body.insertAdjacentHTML('beforeend', "
+                                  + repr(moods).replace("'", '"') + ".map(petSvg).join(''));</script></body>", 1))
+        dom = subprocess.run([chrome(), "--headless=new", "--disable-gpu", "--dump-dom", "--virtual-time-budget=3000",
+                              "file://" + harness], capture_output=True, text=True, timeout=90).stdout
+        for mood in moods:
+            with self.subTest(mood=mood):
+                self.assertIn(f'aria-label="Pixel leopard, {mood}"', dom)
 
 
 if __name__ == "__main__":

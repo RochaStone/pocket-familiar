@@ -24,6 +24,7 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, HERE)
 import mood  # noqa: E402
 import style as house  # noqa: E402
+import painted  # noqa: E402
 
 # Terminal colours and words come from the shared style.json (see style.py). These are
 # Rocha's defaults until apply_style() runs.
@@ -168,7 +169,6 @@ EATS = {
     "rested": "Rested. {name} curls up next to you.",
     "closed": "Closed. {name} batted it off the table.",
 }
-WATCH_LABELS = mood.WATCH_LABELS
 week_start, week_feeds, totals, watch_value, ago = (
     mood.week_start, mood.week_feeds, mood.totals, mood.watch_value, mood.ago)
 
@@ -312,6 +312,7 @@ def web_data(state, config, t):
         "generated": t.strftime("%a %d %b, %H:%M"),
         "style": {k: STYLE.get(k) for k in ("name", "owner", "handle", "palette", "fonts", "lines")},
         "motif": house.motif(STYLE.get("motif")),
+        "painted": painted.svg(m.state, STYLE.get("palette")),
         "total": len(state.get("feeds", [])),
     }
 
@@ -369,8 +370,8 @@ def cmd_config(args):
         config["style"] = None if args.style in ("", "none", "off") else os.path.abspath(os.path.expanduser(args.style))
         changed = True
     if args.watch is not None:
-        if args.watch not in WATCH_LABELS:
-            print(f"Watch one of: {', '.join(WATCH_LABELS)}", file=sys.stderr)
+        if args.watch not in mood.WATCH_LABELS:
+            print(f"Watch one of: {', '.join(mood.WATCH_LABELS)}", file=sys.stderr)
             return 1
         config["watch"], changed = args.watch, True
     if args.name:

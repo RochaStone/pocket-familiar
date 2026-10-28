@@ -7,10 +7,13 @@ Renders the sample week (examples/sample-state.json) with Rocha's bundled style 
 motifs, then uses headless Chrome to take:
   docs/img/hero.png       the y2k-blog window (README hero)
   docs/img/triptych.png   analog | cyberpunk | y2k-blog side by side
-and writes the tiny pixel SVGs: docs/img/step-01.svg ... step-05.svg, divider.svg, heart.svg.
+  docs/img/lucky-moods.png  both Luckys (painted and pixel) in all seven moods
+and writes docs/img/lucky/painted-<mood>.svg (the painted Lucky, one file per mood) and the
+tiny pixel SVGs: docs/img/step-01.svg ... step-05.svg, divider.svg, heart.svg.
 Set CHROME to your Chrome or Chromium path if it is not found on its own.
 """
 import html
+import json
 import os
 import shutil
 import subprocess
@@ -78,6 +81,16 @@ def main():
     with open(os.path.join(OUT, "heart.svg"), "w") as fh:
         fh.write(heart())
 
+    sys.path.insert(0, ROOT)
+    sys.dont_write_bytecode = True
+    import painted
+    with open(os.path.join(ROOT, "examples", "style.rocha-coded.json"), encoding="utf-8") as fh:
+        palette = json.load(fh)["palette"]
+    os.makedirs(os.path.join(OUT, "lucky"), exist_ok=True)
+    for m in painted.MOODS:
+        with open(os.path.join(OUT, "lucky", f"painted-{m}.svg"), "w", encoding="utf-8") as fh:
+            fh.write(painted.svg(m, palette) + "\n")
+
     chrome = find_chrome()
     with tempfile.TemporaryDirectory() as tmp:
         fhome = os.path.join(tmp, "familiar")
@@ -111,8 +124,28 @@ iframe {{ width: 480px; height: 1120px; border: 0; transform: scale(.42); transf
 figcaption {{ font-family: Silkscreen, monospace; color: #FFF7F4; font-size: 13px; text-align: center; margin-top: 8px; }}
 </style>{''.join(frames)}""")
         shot(chrome, strip, os.path.join(OUT, "triptych.png"), 696, 534)
-    for name in sorted(os.listdir(OUT)):
-        print(f"  docs/img/{name}  {os.path.getsize(os.path.join(OUT, name))} bytes")
+
+        # the mood sheet: painted on top, pixel underneath, drawn by the card's own code
+        with open(pages["cyberpunk"], encoding="utf-8") as fh:
+            card = fh.read()
+        cells = "".join(f'<figure><div class="pt">{painted.svg(m, palette, uid=m)}</div><figcaption>{m}</figcaption></figure>'
+                        for m in painted.MOODS)
+        sheet_js = ("document.body.innerHTML = " + json.dumps(f'<div class="sheet"><div class="row">{cells}</div><div class="row" id="px"></div></div>')
+                    + "; document.body.className = 'sheetpage';"
+                    + " document.getElementById('px').innerHTML = " + json.dumps(list(painted.MOODS))
+                    + ".map(m => '<figure><div class=\"pp\">' + petSvg(m) + '</div></figure>').join('');")
+        sheet_css = (f"<style>body.sheetpage {{ background: {PLUM}; padding: 16px; display: block; }} .sheet .row {{ display: flex; gap: 10px; }}"
+                     " .sheet figure { margin: 0 0 10px; } .pt, .pp { width: 150px; height: 150px; background: #FFE3F1; border-radius: 10px; }"
+                     " .pt svg { width: 150px; height: 150px; } .pp svg { width: 130px; height: 130px; margin: 10px; }"
+                     " figcaption { font-family: Silkscreen, monospace; color: #FFF7F4; font-size: 12px; text-align: center; margin-top: 6px; }</style>")
+        sheet = os.path.join(tmp, "moods.html")
+        with open(sheet, "w", encoding="utf-8") as fh:
+            fh.write(card.replace("</head>", sheet_css + "</head>", 1).replace("</body>", f"<script>{sheet_js}</script></body>", 1))
+        shot(chrome, sheet, os.path.join(OUT, "lucky-moods.png"), 1142, 400)
+    for base, _, files in sorted(os.walk(OUT)):
+        for name in sorted(files):
+            path = os.path.join(base, name)
+            print(f"  {os.path.relpath(path, ROOT)}  {os.path.getsize(path)} bytes")
 
 
 if __name__ == "__main__":

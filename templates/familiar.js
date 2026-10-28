@@ -58,7 +58,7 @@ function drawLeopard(state, pose) {
   };
   const up = state === "celebrating";
   // tail behind the body (restless gets a second pose, swapped by CSS)
-  const tails = { rest: [[23, 28], [27, 27], [29, 24], [28, 21]], flick: [[23, 28], [27, 28], [30, 27], [31, 24]] };
+  const tails = { rest: [[23, 28], [27, 28], [29.5, 25.5], [29, 22], [26.5, 21]], flick: [[23, 28], [27, 28], [30, 26], [31, 22], [30, 19]] };   // curled, her signature
   limb(tails[pose || "rest"], 1.1, "A", "tail");
   // body, sitting
   ellipse(16, 24.5, 7.6, 6.2, "A", "body");
@@ -78,34 +78,39 @@ function drawLeopard(state, pose) {
   ellipse(16, 12, 9.6, 7.6, "A", "head");
   ellipse(16, 16, 4.6, 2.8, "P", "head");             // muzzle
   // rosettes: broken rings of hero pink around a fur centre, each ring missing a different side
+  // rosettes: a broken wine ring around a darker fur centre (two tones read as leopard, not as dots)
   const RING = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]];
-  const ros = [[9, 8, 0], [16, 5, 2], [23, 8, 5], [7, 14, 3], [25, 14, 6], [11, 21, 1], [21, 21, 4], [10, 26, 7], [22, 26, 2], [16, 30, 5]];
-  ros.forEach(([x, y, gap]) => RING.forEach(([dx, dy], i) => {
-    if (i === gap || i === (gap + 1) % 8) return;
-    if (inside(x + dx, y + dy) && g[y + dy][x + dx] === "A") set(x + dx, y + dy, "H");
-  }));
+  const ros = [[9, 7, 0], [16, 5, 2], [23, 7, 5], [7, 13, 3], [25, 13, 6], [11, 21, 1], [21, 21, 4], [9, 26, 7], [23, 26, 2]];
+  ros.forEach(([x, y, gap]) => {
+    if (inside(x, y) && g[y][x] === "A") set(x, y, "M");
+    RING.forEach(([dx, dy], i) => {
+      if (i === gap) return;   // one gap, so each ring reads as a rosette
+      if (inside(x + dx, y + dy) && g[y + dy][x + dx] === "A") set(x + dx, y + dy, "H");
+    });
+  });
   // nose
-  set(15, 14, "S"); set(16, 14, "S"); set(15, 15, "K"); set(16, 15, "K");
+  set(15, 14, "H"); set(16, 14, "H"); set(15, 15, "K"); set(16, 15, "K");
   // mouth and grill: four white diamonds on a gold bar, lips in ink
   const open = state === "hungry";
   for (let x = 12; x <= 19; x++) { set(x, 16, "K"); set(x, 18, "K"); }
   ["K", "W", "G", "W", "G", "W", "G", "W"].forEach((c, i) => set(12 + i, 17, c));
   set(19, 17, "K");
+  set(14, 17, "S");   // the grill's shine: one bright gold pixel, always there
   if (open) { for (let x = 13; x <= 18; x++) { set(x, 18, "R"); set(x, 19, "K"); } set(12, 18, "K"); set(19, 18, "K"); }
-  // eyes, per mood
+  // eyes, per mood: 4 wide, 3 tall, so she can really look at you
   const E = {
-    fed:         [[0, 0, "K"], [1, 1, "K"], [2, 0, "K"]],                                  // content: closed, smiling
-    celebrating: [[0, 0, "K"], [1, 0, "K"], [0, 1, "K"], [1, 1, "K"], [0, 0, "W"]],
-    hungry:      [[0, 0, "K"], [1, 0, "K"], [0, 1, "K"], [1, 1, "K"], [1, 0, "W"]],
-    sleepy:      [[0, 1, "K"], [1, 1, "K"], [2, 1, "K"]],
-    asleep:      [[0, 1, "K"], [1, 1, "K"], [2, 1, "K"]],
-    worried:     [[0, 0, "W"], [1, 0, "W"], [2, 0, "W"], [0, 1, "W"], [1, 1, "K"], [2, 1, "W"], [0, 2, "W"], [1, 2, "W"], [2, 2, "W"]],
-    restless:    [[0, 0, "W"], [1, 0, "K"], [2, 0, "K"], [0, 1, "W"], [1, 1, "K"], [2, 1, "K"]]   // looking sideways
+    fed:         [".KK.", "K..K", "...."],          // content: closed and smiling
+    celebrating: ["WKKK", "KKKW", "KKKK"],          // big and bright
+    hungry:      ["WKKK", "KKKK", "KKKW"],          // big, looking up at the snack
+    sleepy:      ["....", "KKKK", ".GK."],          // heavy lid, gold showing below
+    asleep:      ["....", "K..K", ".KK."],          // closed
+    worried:     ["WWWW", "WKKW", "WWWW"],          // wide, tiny pupils
+    restless:    ["KKKK", "WWKK", "WWKK"]           // side-eye
   }[state] || [];
-  [[10, 10], [20, 10]].forEach(([ex, ey]) => E.forEach(([dx, dy, c]) => set(ex + dx, ey + dy, c)));
-  if (state === "worried") [[10, 10], [20, 10]].forEach(([ex, ey]) => {   // ink ring around wide eyes
-    for (let dx = -1; dx <= 3; dx++) for (let dy = -1; dy <= 3; dy++)
-      if ((dx < 0 || dx > 2 || dy < 0 || dy > 2) && g[ey + dy][ex + dx] === "A") set(ex + dx, ey + dy, "K");
+  [[9, 9], [19, 9]].forEach(([ex, ey]) => E.forEach((row, dy) => [...row].forEach((c, dx) => { if (c !== ".") set(ex + dx, ey + dy, c); })));
+  if (state === "worried") [[9, 9], [19, 9]].forEach(([ex, ey]) => {   // ink ring around wide eyes
+    for (let dx = -1; dx <= 4; dx++) for (let dy = -1; dy <= 3; dy++)
+      if ((dx < 0 || dx > 3 || dy < 0 || dy > 2) && inside(ex + dx, ey + dy) && g[ey + dy][ex + dx] === "A") set(ex + dx, ey + dy, "K");
   });
   // ink outline on every outer edge, and a neck line where the head meets the body
   const filled = (x, y) => inside(x, y) && g[y][x] !== null;
@@ -118,8 +123,13 @@ function drawLeopard(state, pose) {
   ink.forEach(([x, y]) => set(x, y, "K"));
   return g;
 }
-const PIX = () => ({ K: PAL.ink, A: PAL.accent, H: PAL.wine, P: PAL.paper_pink, S: PAL.wine,
-  W: "#FFFFFF", G: PAL.gold, R: PAL.marker });
+function mixHex(a, b, t) {   // blend two hex colours, t = 0..1
+  const p = x => [1, 3, 5].map(i => parseInt(x.length === 4 ? x[Math.ceil(i / 2)].repeat(2) : x.slice(i, i + 2), 16));
+  const [ra, rb] = [p(a), p(b)];
+  return "#" + ra.map((v, i) => Math.round(v + (rb[i] - v) * t).toString(16).padStart(2, "0")).join("");
+}
+const PIX = () => ({ K: PAL.ink, A: PAL.accent, H: PAL.wine, M: mixHex(PAL.accent, PAL.wine, .3), P: PAL.paper_pink,
+  S: mixHex(PAL.gold, "#FFFFFF", .6), W: "#FFFFFF", G: PAL.gold, R: PAL.marker });
 function petSvg(state) {   // returns SVG markup built only from our own numbers and palette
   const colours = PIX();
   const svgPx = g => g.map((row, y) => row.map((c, x) => c ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${colours[c]}"/>` : "").join("")).join("");
@@ -144,7 +154,13 @@ function h(spec, ...kids) {
   kids.flat().forEach(k => { if (k === null || k === undefined || k === false) return; n.append(k instanceof Node ? k : String(k)); });
   return n;
 }
-function pet(cls) { const box = h("div." + cls); box.innerHTML = petSvg(d.state); return box; }   // our own SVG only
+// Two renderings of one mood: painted (analog, y2k-blog) and pixel (cyberpunk, terminal, status line).
+// Both are our own SVG, built from numbers and the checked palette, never from anything she typed.
+function pet(cls, style) {
+  const box = h("div." + cls);
+  box.innerHTML = style === "painted" && d.painted ? d.painted : petSvg(d.state);
+  return box;
+}
 const FED = 100 - Math.max(0, Math.min(100, d.hunger));   // full bar = fed
 const celebrating = d.state === "celebrating";
 function blocks(n = 10) {   // a meter made of blocks
@@ -192,7 +208,7 @@ function fitOneLine(node, start, min) {   // shrink a line until it fits on one 
 function analog() {
   const slogan = LINES.todo ? h("div.slogan", LINES.todo) : null;
   const stage = h("div.stage",
-    h("div.egg", pet("screen"), h("div.buttons", h("span"), h("span"), h("span"))),
+    h("div.egg", pet("screen", "painted"), h("div.buttons", h("span"), h("span"), h("span"))),
     h("div.stamp", d.state),
     celebrating && LINES.celebrate ? h("div.sticker", LINES.celebrate) : null);
   const meter = h("div.meter", h("i")); meter.firstChild.style.width = FED + "%";
@@ -258,7 +274,7 @@ function y2kBlog() {
     h("div.marquee", h("span", celebrating && LINES.celebrate ? "✧ " + LINES.celebrate + " ✧ " + d.line : d.line)),
     h("div.cols",
       h("aside.side",
-        h("div.box.petbox", pet("blogpet"), h("div.petname", d.name)),
+        h("div.box.petbox", pet("blogpet", "painted"), h("div.petname", d.name)),
         box("about me", h("p", "pocket familiar. I eat what you ship.")),
         box("mood:", h("p.mood", "✧ " + d.state), h("p.small", d.reason)),
         box("streak", h("p", d.streak + " day" + (d.streak === 1 ? "" : "s")), meter, h("p.small", "fed " + FED + "%")),

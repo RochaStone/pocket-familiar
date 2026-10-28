@@ -128,6 +128,10 @@ Exactly one mood wins. She checks them in this order.
 
 The ✧ is her grill. The ∴ are her spots.
 
+She comes in two renderings from the same mood: painted for the web card (analog and y2k-blog), pixel for the terminal, the status line and the cyberpunk handheld.
+
+![Lucky in all seven moods, painted on top and pixel underneath](docs/img/lucky-moods.png)
+
 ## Make her yours
 
 ```sh
@@ -172,6 +176,7 @@ Pairs with [merwitch-mode](https://github.com/RochaStone/merwitch-mode): install
 | `mood.py` | the mood rules, documented at the top |
 | `statusline.sh` | the Claude Code status line |
 | `hooks/` | session start greeting, session length tracking |
+| `painted.py` | the painted Lucky, a soft-shaded SVG in seven moods |
 | `templates/` | the web card: one page, one script, three motif skins, inlined into a single file |
 | `style.py`, `STYLE.md`, `style.example.json` | the shared style file: lookup, keys, a blank one to fill in |
 | `install.sh`, `uninstall.sh` | safe setup and a clean undo |

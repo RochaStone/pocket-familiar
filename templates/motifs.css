@@ -41,6 +41,7 @@ body.m-analog { background-color: var(--ground); }
     background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 3px);
   }
   .screen .pet-svg { width: 116px; height: 116px; }
+  .screen .painted-svg { width: 132px; height: 132px; display: block; }
   .buttons { display: flex; gap: 14px; }
   .buttons span { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); box-shadow: inset -2px -3px 0 rgba(0,0,0,.25); }
   .stamp {
@@ -183,6 +184,7 @@ body.m-y2k-blog {
 .box .meter { height: 8px; border: 1.5px solid var(--ink); background: var(--cream); margin: 4px 0; }
 .box .meter i { display: block; height: 100%; background: var(--candy); }
 .petbox { text-align: center; }
+.blogpet .painted-svg { width: 168px; height: 168px; display: block; margin: 2px auto; background: var(--blush); border: 1.5px solid var(--ink); }
 .blogpet .pet-svg { width: 132px; height: 132px; margin: 4px auto; background: var(--blush); border: 1.5px solid var(--ink); }
 .petname { font-family: var(--serif); font-weight: 900; font-size: 26px; }
 .counter { text-align: center; font-size: 10px; color: var(--ink); }
